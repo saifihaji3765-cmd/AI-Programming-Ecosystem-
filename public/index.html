@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AI Code Mentor</title>
+</head>
+<body>
+
+<h1>AI Code Debugger</h1>
+
+<textarea id="code" rows="10" cols="50" placeholder="Paste your code here"></textarea><br>
+
+<select id="language">
+    <option>javascript</option>
+    <option>python</option>
+    <option>java</option>
+    <option>cpp</option>
+</select>
+
+<button onclick="analyzeCode()">Analyze</button>
+
+<pre id="output"></pre>
+
+<script>
+async function analyzeCode() {
+    let code = document.getElementById("code").value;
+    let language = document.getElementById("language").value;
+
+    let res = await fetch("/analyze", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code, language })
+    });
+
+    let data = await res.json();
+
+    document.getElementById("output").innerText =
+        JSON.stringify(data, null, 2);
+}
+</script>
+
+</body>
+</html>
