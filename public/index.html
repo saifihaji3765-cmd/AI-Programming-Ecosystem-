@@ -3,7 +3,7 @@
 
 <head>
 
-<meta charset="UTF-8" />
+<meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
 <title>AI Dev Mentor Pro</title>
@@ -22,18 +22,55 @@ body{
   color:white;
   height:100vh;
   display:flex;
+}
+
+.sidebar{
+  width:280px;
+  background:#111827;
+  border-right:1px solid #1f2937;
+  display:flex;
   flex-direction:column;
 }
 
-.topbar{
-  background:#111827;
-  padding:18px 24px;
-  border-bottom:1px solid #1f2937;
+.logo{
+  padding:22px;
   font-size:24px;
   font-weight:bold;
+  border-bottom:1px solid #1f2937;
+}
+
+.history{
+  flex:1;
+  overflow-y:auto;
+  padding:18px;
+}
+
+.history-title{
+  margin-bottom:18px;
+  color:#60a5fa;
+  font-size:18px;
+}
+
+.history-item{
+  background:#1f2937;
+  padding:14px;
+  border-radius:14px;
+  margin-bottom:12px;
+  cursor:pointer;
+  transition:0.2s;
+}
+
+.history-item:hover{
+  background:#374151;
 }
 
 .main{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+}
+
+.chat{
   flex:1;
   overflow-y:auto;
   padding:20px;
@@ -41,12 +78,12 @@ body{
 
 .welcome{
   text-align:center;
-  margin-top:60px;
+  margin-top:80px;
 }
 
 .welcome h1{
   font-size:42px;
-  margin-bottom:15px;
+  margin-bottom:14px;
 }
 
 .welcome p{
@@ -64,26 +101,26 @@ textarea{
   width:100%;
   height:130px;
   background:#1f2937;
+  color:white;
   border:none;
   outline:none;
   resize:none;
-  color:white;
-  padding:18px;
   border-radius:18px;
+  padding:18px;
   font-size:16px;
 }
 
 .controls{
-  margin-top:15px;
   display:flex;
-  flex-wrap:wrap;
   gap:10px;
+  flex-wrap:wrap;
+  margin-top:15px;
 }
 
 button{
-  border:none;
   background:#2563eb;
   color:white;
+  border:none;
   padding:12px 18px;
   border-radius:12px;
   cursor:pointer;
@@ -105,19 +142,19 @@ select{
 .message{
   background:#111827;
   border:1px solid #1f2937;
-  padding:22px;
   border-radius:20px;
+  padding:22px;
   margin-bottom:22px;
 }
 
 .section{
-  margin-top:22px;
+  margin-top:24px;
 }
 
 .section-title{
+  color:#60a5fa;
   font-size:20px;
   margin-bottom:12px;
-  color:#60a5fa;
 }
 
 .code-box{
@@ -125,16 +162,15 @@ select{
   border:1px solid #334155;
   border-radius:16px;
   overflow:hidden;
-  margin-top:12px;
 }
 
 .code-top{
   background:#111827;
+  border-bottom:1px solid #1f2937;
   display:flex;
   justify-content:space-between;
   align-items:center;
   padding:12px 16px;
-  border-bottom:1px solid #1f2937;
 }
 
 .copy-btn{
@@ -146,35 +182,31 @@ select{
 
 pre{
   overflow-x:auto;
-  padding:18px;
   white-space:pre-wrap;
   line-height:1.6;
+  padding:18px;
   color:#e2e8f0;
 }
 
 .download-btn{
   display:inline-block;
-  margin-top:18px;
-  text-decoration:none;
   background:#16a34a;
   color:white;
+  text-decoration:none;
   padding:14px 20px;
   border-radius:12px;
+  margin-top:20px;
   font-weight:bold;
 }
 
-.typing{
-  opacity:0.8;
-}
+@media(max-width:900px){
 
-@media(max-width:768px){
+  .sidebar{
+    display:none;
+  }
 
   .welcome h1{
     font-size:30px;
-  }
-
-  textarea{
-    height:110px;
   }
 
 }
@@ -185,48 +217,75 @@ pre{
 
 <body>
 
-<div class="topbar">
-  🚀 AI Dev Mentor Pro
-</div>
+<div class="sidebar">
 
-<div class="main" id="chat">
+  <div class="logo">
+    🚀 AI Dev Mentor
+  </div>
 
-  <div class="welcome">
+  <div class="history">
 
-    <h1>Build Anything with AI</h1>
+    <div class="history-title">
+      📂 Previous Projects
+    </div>
 
-    <p>
-      Debug code, generate projects, fix errors and build complete systems.
-    </p>
+    <div id="historyList"></div>
 
   </div>
 
 </div>
 
-<div class="input-area">
+<div class="main">
 
-  <textarea
-    id="prompt"
-    placeholder="Ask AI to build, debug or generate anything..."
-  ></textarea>
+  <div class="chat" id="chat">
 
-  <div class="controls">
+    <div class="welcome">
 
-    <select id="mode">
-      <option value="analyze">💻 Analyze Code</option>
-      <option value="project">🏗 Generate Project</option>
-    </select>
+      <h1>Build Anything with AI</h1>
 
-    <select id="language">
-      <option>javascript</option>
-      <option>python</option>
-      <option>java</option>
-      <option>cpp</option>
-    </select>
+      <p>
+        Debug code, generate projects and build complete software systems.
+      </p>
 
-    <button onclick="runAI()">
-      🚀 Run AI
-    </button>
+    </div>
+
+  </div>
+
+  <div class="input-area">
+
+    <textarea
+      id="prompt"
+      placeholder="Ask AI to build or debug anything..."
+    ></textarea>
+
+    <div class="controls">
+
+      <select id="mode">
+        <option value="analyze">
+          💻 Analyze Code
+        </option>
+
+        <option value="project">
+          🏗 Generate Project
+        </option>
+      </select>
+
+      <select id="language">
+        <option>javascript</option>
+        <option>python</option>
+        <option>java</option>
+        <option>cpp</option>
+      </select>
+
+      <button onclick="runAI()">
+        🚀 Run AI
+      </button>
+
+      <button onclick="clearHistory()">
+        🗑 Clear History
+      </button>
+
+    </div>
 
   </div>
 
@@ -234,13 +293,69 @@ pre{
 
 <script>
 
+let historyData = JSON.parse(
+  localStorage.getItem("ai_history")
+) || [];
+
+function saveHistory(title,content){
+
+  historyData.unshift({
+    title,
+    content
+  });
+
+  localStorage.setItem(
+    "ai_history",
+    JSON.stringify(historyData)
+  );
+
+  renderHistory();
+}
+
+function renderHistory(){
+
+  const list = document.getElementById("historyList");
+
+  list.innerHTML = "";
+
+  historyData.forEach(item => {
+
+    const div = document.createElement("div");
+
+    div.className = "history-item";
+
+    div.innerText = item.title;
+
+    div.onclick = () => {
+
+      addHTML(item.content);
+
+    };
+
+    list.appendChild(div);
+
+  });
+
+}
+
+function clearHistory(){
+
+  localStorage.removeItem("ai_history");
+
+  historyData = [];
+
+  renderHistory();
+
+  alert("History cleared");
+}
+
 function copyCode(id){
 
   const text = document.getElementById(id).innerText;
 
   navigator.clipboard.writeText(text);
 
-  alert("✅ Code copied");
+  alert("Code copied");
 }
 
 function addHTML(html){
@@ -267,7 +382,7 @@ async function runAI(){
   const language = document.getElementById("language").value;
 
   addHTML(`
-    <div class="typing">
+    <div class="section-title">
       🧠 AI is thinking...
     </div>
   `);
@@ -291,9 +406,9 @@ async function runAI(){
 
     const data = await res.json();
 
-    const fixedId = "fixedCode_" + Date.now();
+    const fixedId = "fixed_" + Date.now();
 
-    addHTML(`
+    const html = `
 
       <div class="section">
 
@@ -355,14 +470,21 @@ ${(data.explanation || []).join("\n\n")}
           </div>
 
           <pre id="${fixedId}">
-${data.fixedCode || "No fixed code generated"}
+${data.fixedCode || "No code generated"}
           </pre>
 
         </div>
 
       </div>
 
-    `);
+    `;
+
+    addHTML(html);
+
+    saveHistory(
+      "🐞 Code Analysis",
+      html
+    );
 
   }
 
@@ -388,7 +510,8 @@ ${data.fixedCode || "No fixed code generated"}
 
     (data.files || []).forEach((file,index) => {
 
-      const fileId = "file_" + index + "_" + Date.now();
+      const fileId =
+        "file_" + index + "_" + Date.now();
 
       filesHTML += `
 
@@ -426,7 +549,7 @@ ${file.content}
       `;
     });
 
-    addHTML(`
+    const html = `
 
       <div class="section">
 
@@ -473,13 +596,23 @@ ${data.deployGuide}
         ⬇ Download ZIP Project
       </a>
 
-    `);
+    `;
+
+    addHTML(html);
+
+    saveHistory(
+      data.projectName || "Generated Project",
+      html
+    );
 
   }
 
 }
 
+renderHistory();
+
 </script>
 
 </body>
+
 </html>
