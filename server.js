@@ -177,7 +177,16 @@ ${idea}
 
     archive.directory(projectDir, false);
 
-    await archive.finalize();
+    archive.finalize();
+
+output.on("close", () => {
+
+  res.json({
+    ...result,
+    download: "/download-project"
+  });
+
+});
 
     res.json({
       ...result,
@@ -207,7 +216,15 @@ app.get("/download-project", (req, res) => {
 
   const zipPath = path.join(__dirname, "project.zip");
 
-  res.download(zipPath);
+  if (fs.existsSync(zipPath)) {
+
+    res.download(zipPath);
+
+  } else {
+
+    res.status(404).send("ZIP file not found");
+
+  }
 
 });
 
