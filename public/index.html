@@ -1,496 +1,482 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>AI Dev Mentor Pro</title>
 
-  <style>
-    *{
-      margin:0;
-      padding:0;
-      box-sizing:border-box;
-      font-family:Arial, sans-serif;
-    }
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
-    body{
-      background:#0f172a;
-      color:white;
-      height:100vh;
-      display:flex;
-      flex-direction:column;
-    }
+<title>AI Dev Mentor Pro</title>
 
-    .topbar{
-      height:70px;
-      background:#111827;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      padding:0 20px;
-      border-bottom:1px solid #1f2937;
-    }
+<style>
 
-    .logo{
-      font-size:22px;
-      font-weight:bold;
-    }
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:Arial,sans-serif;
+}
 
-    .top-actions{
-      display:flex;
-      gap:10px;
-    }
+body{
+  background:#0f172a;
+  color:white;
+  height:100vh;
+  display:flex;
+  flex-direction:column;
+}
 
-    .top-btn{
-      background:#1f2937;
-      border:none;
-      color:white;
-      padding:10px 16px;
-      border-radius:12px;
-      cursor:pointer;
-    }
+.topbar{
+  background:#111827;
+  padding:18px 24px;
+  border-bottom:1px solid #1f2937;
+  font-size:24px;
+  font-weight:bold;
+}
 
-    .main{
-      flex:1;
-      display:flex;
-      overflow:hidden;
-    }
+.main{
+  flex:1;
+  overflow-y:auto;
+  padding:20px;
+}
 
-    .sidebar{
-      width:260px;
-      background:#111827;
-      border-right:1px solid #1f2937;
-      padding:20px;
-      overflow-y:auto;
-    }
+.welcome{
+  text-align:center;
+  margin-top:60px;
+}
 
-    .sidebar h3{
-      margin-bottom:20px;
-    }
+.welcome h1{
+  font-size:42px;
+  margin-bottom:15px;
+}
 
-    .menu-btn{
-      width:100%;
-      background:#1f2937;
-      border:none;
-      color:white;
-      padding:14px;
-      border-radius:12px;
-      margin-bottom:12px;
-      text-align:left;
-      cursor:pointer;
-      transition:0.2s;
-    }
+.welcome p{
+  color:#94a3b8;
+  font-size:18px;
+}
 
-    .menu-btn:hover{
-      background:#374151;
-    }
+.input-area{
+  background:#111827;
+  border-top:1px solid #1f2937;
+  padding:20px;
+}
 
-    .content{
-      flex:1;
-      display:flex;
-      flex-direction:column;
-      height:100%;
-    }
+textarea{
+  width:100%;
+  height:130px;
+  background:#1f2937;
+  border:none;
+  outline:none;
+  resize:none;
+  color:white;
+  padding:18px;
+  border-radius:18px;
+  font-size:16px;
+}
 
-    .chat-area{
-      flex:1;
-      overflow-y:auto;
-      padding:30px;
-    }
+.controls{
+  margin-top:15px;
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+}
 
-    .welcome{
-      text-align:center;
-      margin-top:100px;
-    }
+button{
+  border:none;
+  background:#2563eb;
+  color:white;
+  padding:12px 18px;
+  border-radius:12px;
+  cursor:pointer;
+  font-weight:bold;
+}
 
-    .welcome h1{
-      font-size:42px;
-      margin-bottom:20px;
-    }
+button:hover{
+  opacity:0.9;
+}
 
-    .welcome p{
-      color:#94a3b8;
-      font-size:18px;
-    }
+select{
+  background:#1f2937;
+  color:white;
+  border:none;
+  padding:12px;
+  border-radius:10px;
+}
 
-    .card-grid{
-      display:grid;
-      grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
-      gap:16px;
-      margin-top:40px;
-    }
+.message{
+  background:#111827;
+  border:1px solid #1f2937;
+  padding:22px;
+  border-radius:20px;
+  margin-bottom:22px;
+}
 
-    .card{
-      background:#111827;
-      border:1px solid #1f2937;
-      padding:20px;
-      border-radius:20px;
-      cursor:pointer;
-      transition:0.2s;
-    }
+.section{
+  margin-top:22px;
+}
 
-    .card:hover{
-      transform:translateY(-4px);
-      background:#1f2937;
-    }
+.section-title{
+  font-size:20px;
+  margin-bottom:12px;
+  color:#60a5fa;
+}
 
-    .message{
-      background:#111827;
-      border:1px solid #1f2937;
-      padding:20px;
-      border-radius:20px;
-      margin-bottom:20px;
-      white-space:pre-wrap;
-      line-height:1.6;
-    }
+.code-box{
+  background:#020617;
+  border:1px solid #334155;
+  border-radius:16px;
+  overflow:hidden;
+  margin-top:12px;
+}
 
-    .input-area{
-      padding:20px;
-      border-top:1px solid #1f2937;
-      background:#111827;
-    }
+.code-top{
+  background:#111827;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:12px 16px;
+  border-bottom:1px solid #1f2937;
+}
 
-    .input-box{
-      background:#1f2937;
-      border-radius:20px;
-      padding:16px;
-    }
+.copy-btn{
+  background:#2563eb;
+  padding:8px 12px;
+  border-radius:10px;
+  font-size:14px;
+}
 
-    textarea{
-      width:100%;
-      height:120px;
-      resize:none;
-      background:transparent;
-      border:none;
-      outline:none;
-      color:white;
-      font-size:16px;
-    }
+pre{
+  overflow-x:auto;
+  padding:18px;
+  white-space:pre-wrap;
+  line-height:1.6;
+  color:#e2e8f0;
+}
 
-    .bottom-actions{
-      margin-top:14px;
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-    }
+.download-btn{
+  display:inline-block;
+  margin-top:18px;
+  text-decoration:none;
+  background:#16a34a;
+  color:white;
+  padding:14px 20px;
+  border-radius:12px;
+  font-weight:bold;
+}
 
-    button{
-      border:none;
-      background:#2563eb;
-      color:white;
-      padding:12px 18px;
-      border-radius:12px;
-      cursor:pointer;
-      font-weight:bold;
-    }
+.typing{
+  opacity:0.8;
+}
 
-    button:hover{
-      opacity:0.9;
-    }
+@media(max-width:768px){
 
-    select{
-      background:#0f172a;
-      color:white;
-      border:none;
-      padding:10px;
-      border-radius:10px;
-    }
+  .welcome h1{
+    font-size:30px;
+  }
 
-    .typing{
-      display:inline-block;
-      overflow:hidden;
-      border-right:2px solid white;
-      white-space:pre-wrap;
-      animation:blink 0.7s infinite;
-    }
+  textarea{
+    height:110px;
+  }
 
-    @keyframes blink{
-      50%{
-        border-color:transparent;
-      }
-    }
+}
 
-    @media(max-width:900px){
+</style>
 
-      .sidebar{
-        display:none;
-      }
-
-      .welcome h1{
-        font-size:28px;
-      }
-
-      textarea{
-        height:100px;
-      }
-    }
-  </style>
 </head>
 
 <body>
 
-  <div class="topbar">
+<div class="topbar">
+  🚀 AI Dev Mentor Pro
+</div>
 
-    <div class="logo">
-      🚀 AI Dev Mentor Pro
-    </div>
+<div class="main" id="chat">
 
-    <div class="top-actions">
-      <button class="top-btn">⚡ Upgrade</button>
-      <button class="top-btn">👤 Profile</button>
-    </div>
+  <div class="welcome">
+
+    <h1>Build Anything with AI</h1>
+
+    <p>
+      Debug code, generate projects, fix errors and build complete systems.
+    </p>
+
+  </div>
+
+</div>
+
+<div class="input-area">
+
+  <textarea
+    id="prompt"
+    placeholder="Ask AI to build, debug or generate anything..."
+  ></textarea>
+
+  <div class="controls">
+
+    <select id="mode">
+      <option value="analyze">💻 Analyze Code</option>
+      <option value="project">🏗 Generate Project</option>
+    </select>
+
+    <select id="language">
+      <option>javascript</option>
+      <option>python</option>
+      <option>java</option>
+      <option>cpp</option>
+    </select>
+
+    <button onclick="runAI()">
+      🚀 Run AI
+    </button>
 
   </div>
 
-  <div class="main">
-
-    <div class="sidebar">
-
-      <h3>🧠 AI Tools</h3>
-
-      <button class="menu-btn">
-        💻 AI Code Analyzer
-      </button>
-
-      <button class="menu-btn">
-        ⚡ Auto Fix System
-      </button>
-
-      <button class="menu-btn">
-        🏗 AI Project Generator
-      </button>
-
-      <button class="menu-btn">
-        📦 Full Stack Builder
-      </button>
-
-      <button class="menu-btn">
-        🚀 Deploy Assistant
-      </button>
-
-      <button class="menu-btn">
-        🔒 Security Scanner
-      </button>
-
-      <button class="menu-btn">
-        🧪 API Tester
-      </button>
-
-      <button class="menu-btn">
-        🐞 Error Detector
-      </button>
-
-    </div>
-
-    <div class="content">
-
-      <div class="chat-area" id="chatArea">
-
-        <div class="welcome">
-
-          <h1>Build Anything with AI</h1>
-
-          <p>
-            Debug code, generate projects, fix errors, deploy apps and build complete systems.
-          </p>
-
-          <div class="card-grid">
-
-            <div class="card">
-              💻 Analyze broken code instantly
-            </div>
-
-            <div class="card">
-              ⚡ Auto-fix errors with AI
-            </div>
-
-            <div class="card">
-              🏗 Generate full stack projects
-            </div>
-
-            <div class="card">
-              🚀 Get deployment instructions
-            </div>
-
-          </div>
-
-        </div>
-
-      </div>
-
-      <div class="input-area">
-
-        <div class="input-box">
-
-          <textarea
-            id="prompt"
-            placeholder="Ask AI to build, debug, fix or generate anything..."
-          ></textarea>
-
-          <div class="bottom-actions">
-
-            <select id="mode">
-              <option value="analyze">💻 Analyze Code</option>
-              <option value="project">🏗 Generate Project</option>
-            </select>
-
-            <select id="language">
-              <option>javascript</option>
-              <option>python</option>
-              <option>java</option>
-              <option>cpp</option>
-            </select>
-
-            <button onclick="analyzeCode()">
-              🚀 Analyze
-            </button>
-
-            <button onclick="generateProject()">
-              🏗 Generate
-            </button>
-
-            <button onclick="autoFixCode()">
-              ⚡ Auto Fix
-            </button>
-
-          </div>
-
-        </div>
-
-      </div>
-
-    </div>
-
-  </div>
+</div>
 
 <script>
 
-let latestFixedCode = "";
+function copyCode(id){
 
-function addMessage(title, content){
+  const text = document.getElementById(id).innerText;
 
-  const area = document.getElementById("chatArea");
+  navigator.clipboard.writeText(text);
+
+  alert("✅ Code copied");
+}
+
+function addHTML(html){
+
+  const chat = document.getElementById("chat");
 
   const div = document.createElement("div");
 
   div.className = "message";
 
-  div.innerHTML = `
-    <h2>${title}</h2>
-    <div class="typing">${content}</div>
-  `;
+  div.innerHTML = html;
 
-  area.appendChild(div);
+  chat.appendChild(div);
 
-  area.scrollTop = area.scrollHeight;
+  chat.scrollTop = chat.scrollHeight;
 }
 
-async function analyzeCode(){
+async function runAI(){
 
-  const code = document.getElementById("prompt").value;
+  const prompt = document.getElementById("prompt").value;
+
+  const mode = document.getElementById("mode").value;
 
   const language = document.getElementById("language").value;
 
-  addMessage("🧠 AI Thinking...", "Analyzing your code...");
+  addHTML(`
+    <div class="typing">
+      🧠 AI is thinking...
+    </div>
+  `);
 
-  const res = await fetch("/analyze", {
-    method:"POST",
-    headers:{
-      "Content-Type":"application/json"
-    },
-    body:JSON.stringify({
-      code,
-      language
-    })
-  });
+  if(mode === "analyze"){
 
-  const data = await res.json();
+    const res = await fetch("/analyze", {
 
-  latestFixedCode = data.fixedCode || "";
+      method:"POST",
 
-  addMessage(
-    "🐞 Issues",
-    (data.issues || []).join("\n\n")
-  );
+      headers:{
+        "Content-Type":"application/json"
+      },
 
-  addMessage(
-    "⚡ Fixes",
-    (data.fixes || []).join("\n\n")
-  );
+      body:JSON.stringify({
+        code:prompt,
+        language
+      })
 
-  addMessage(
-    "📘 Explanation",
-    (data.explanation || []).join("\n\n")
-  );
+    });
 
-  addMessage(
-    "💻 Fixed Code",
-    data.fixedCode || "No fixed code generated"
-  );
-}
+    const data = await res.json();
 
-async function generateProject(){
+    const fixedId = "fixedCode_" + Date.now();
 
-  const idea = document.getElementById("prompt").value;
+    addHTML(`
 
-  addMessage(
-    "🏗 AI Architect",
-    "Generating complete software architecture..."
-  );
+      <div class="section">
 
-  const res = await fetch("/generate-project", {
-    method:"POST",
-    headers:{
-      "Content-Type":"application/json"
-    },
-    body:JSON.stringify({
-      idea
-    })
-  });
+        <div class="section-title">
+          🐞 Problems Found
+        </div>
 
-  const data = await res.json();
+        <pre>
+${(data.issues || []).join("\n\n")}
+        </pre>
 
-  addMessage(
-    "📦 Project Name",
-    data.projectName || "Unknown"
-  );
+      </div>
 
-  addMessage(
-    "🗂 Folder Structure",
-    data.folderStructure || "Not generated"
-  );
+      <div class="section">
 
-  addMessage(
-    "🎨 Frontend Code",
-    data.frontendCode || "Not generated"
-  );
+        <div class="section-title">
+          ⚡ Best Fixes
+        </div>
 
-  addMessage(
-    "⚙ Backend Code",
-    data.backendCode || "Not generated"
-  );
+        <pre>
+${(data.fixes || []).join("\n\n")}
+        </pre>
 
-  addMessage(
-    "📘 Setup Guide",
-    data.setupGuide || "Not generated"
-  );
+      </div>
 
-  addMessage(
-    "🚀 Deploy Guide",
-    data.deployGuide || "Not generated"
-  );
-}
+      <div class="section">
 
-function autoFixCode(){
+        <div class="section-title">
+          📘 Explanation
+        </div>
 
-  if(!latestFixedCode){
-    alert("Analyze code first");
-    return;
+        <pre>
+${(data.explanation || []).join("\n\n")}
+        </pre>
+
+      </div>
+
+      <div class="section">
+
+        <div class="section-title">
+          💻 Final Corrected Code
+        </div>
+
+        <div class="code-box">
+
+          <div class="code-top">
+
+            <div>
+              ${language}
+            </div>
+
+            <button
+              class="copy-btn"
+              onclick="copyCode('${fixedId}')"
+            >
+              Copy
+            </button>
+
+          </div>
+
+          <pre id="${fixedId}">
+${data.fixedCode || "No fixed code generated"}
+          </pre>
+
+        </div>
+
+      </div>
+
+    `);
+
   }
 
-  document.getElementById("prompt").value = latestFixedCode;
+  if(mode === "project"){
 
-  alert("⚡ Code auto-fixed successfully");
+    const res = await fetch("/generate-project", {
+
+      method:"POST",
+
+      headers:{
+        "Content-Type":"application/json"
+      },
+
+      body:JSON.stringify({
+        idea:prompt
+      })
+
+    });
+
+    const data = await res.json();
+
+    let filesHTML = "";
+
+    (data.files || []).forEach((file,index) => {
+
+      const fileId = "file_" + index + "_" + Date.now();
+
+      filesHTML += `
+
+        <div class="section">
+
+          <div class="section-title">
+            📄 ${file.name}
+          </div>
+
+          <div class="code-box">
+
+            <div class="code-top">
+
+              <div>
+                Source File
+              </div>
+
+              <button
+                class="copy-btn"
+                onclick="copyCode('${fileId}')"
+              >
+                Copy
+              </button>
+
+            </div>
+
+            <pre id="${fileId}">
+${file.content}
+            </pre>
+
+          </div>
+
+        </div>
+
+      `;
+    });
+
+    addHTML(`
+
+      <div class="section">
+
+        <div class="section-title">
+          📦 Project Overview
+        </div>
+
+        <pre>
+${data.projectName}
+        </pre>
+
+      </div>
+
+      ${filesHTML}
+
+      <div class="section">
+
+        <div class="section-title">
+          📘 Setup Guide
+        </div>
+
+        <pre>
+${data.setupGuide}
+        </pre>
+
+      </div>
+
+      <div class="section">
+
+        <div class="section-title">
+          🌍 Deploy Guide
+        </div>
+
+        <pre>
+${data.deployGuide}
+        </pre>
+
+      </div>
+
+      <a
+        class="download-btn"
+        href="/download-project"
+      >
+        ⬇ Download ZIP Project
+      </a>
+
+    `);
+
+  }
+
 }
 
 </script>
