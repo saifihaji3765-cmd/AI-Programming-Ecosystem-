@@ -1,20 +1,70 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>AI Code Debugger Pro</title>
+  <title>AI Dev Mentor Pro</title>
   <style>
-    body { font-family: Arial; background:#0f172a; color:white; display:flex; }
-    .left { width:40%; padding:20px; }
-    .right { width:60%; padding:20px; }
-    textarea { width:100%; height:300px; }
-    button { width:100%; padding:10px; margin-top:10px; }
-    .box { background:#1f2937; padding:10px; margin-bottom:10px; }
+    body {
+      margin: 0;
+      font-family: Arial;
+      background: #0f172a;
+      color: white;
+      display: flex;
+      height: 100vh;
+    }
+
+    .left {
+      width: 40%;
+      padding: 20px;
+      background: #111827;
+    }
+
+    .right {
+      width: 60%;
+      padding: 20px;
+      overflow-y: auto;
+    }
+
+    textarea {
+      width: 100%;
+      height: 300px;
+      background: #1f2937;
+      color: white;
+      border: none;
+      padding: 10px;
+    }
+
+    button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      background: #3b82f6;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    .box {
+      background: #1f2937;
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 8px;
+      white-space: pre-wrap;
+    }
+
+    .typing::after {
+      content: " |";
+      animation: blink 1s infinite;
+    }
+
+    @keyframes blink {
+      50% { opacity: 0; }
+    }
   </style>
 </head>
 <body>
 
 <div class="left">
-  <h2>AI Code Editor</h2>
+  <h2>💻 AI Code Editor</h2>
 
   <select id="lang">
     <option>javascript</option>
@@ -23,22 +73,25 @@
     <option>cpp</option>
   </select>
 
-  <textarea id="code"></textarea>
+  <textarea id="code" placeholder="Paste your code..."></textarea>
 
-  <button onclick="run()">Analyze Code</button>
+  <button onclick="analyze()">🚀 Analyze Code</button>
+  <button onclick="autoFix()">⚡ Auto Fix Code</button>
 </div>
 
 <div class="right">
-  <h2>AI Output</h2>
+  <h2>🧠 AI Output</h2>
 
-  <div class="box" id="issues">Issues</div>
-  <div class="box" id="fixes">Fixes</div>
-  <div class="box" id="explanation">Explanation</div>
-  <div class="box" id="fixed">Fixed Code</div>
+  <div class="box" id="issues">Issues...</div>
+  <div class="box" id="fixes">Fixes...</div>
+  <div class="box" id="explanation">Explanation...</div>
+  <div class="box typing" id="fixed">Fixed Code...</div>
 </div>
 
 <script>
-async function run() {
+let lastResult = null;
+
+async function analyze() {
   let code = document.getElementById("code").value;
   let language = document.getElementById("lang").value;
 
@@ -49,18 +102,35 @@ async function run() {
   });
 
   let data = await res.json();
+  lastResult = data;
 
-  document.getElementById("issues").innerText =
-    "Issues:\n" + (data.issues?.join("\n") || "None");
+  typeWriter("issues", data.issues?.join("\n") || "None");
+  typeWriter("fixes", data.fixes?.join("\n") || "None");
+  typeWriter("explanation", data.explanation?.join("\n") || "None");
+  typeWriter("fixed", data.fixedCode || "Not generated");
+}
 
-  document.getElementById("fixes").innerText =
-    "Fixes:\n" + (data.fixes?.join("\n") || "None");
+function autoFix() {
+  if (!lastResult?.fixedCode) return alert("First analyze code");
 
-  document.getElementById("explanation").innerText =
-    "Explanation:\n" + (data.explanation?.join("\n") || "None");
+  document.getElementById("code").value = lastResult.fixedCode;
+  alert("Code Auto Fixed ⚡");
+}
 
-  document.getElementById("fixed").innerText =
-    "Fixed Code:\n" + (data.fixedCode || "Not generated");
+function typeWriter(id, text) {
+  let i = 0;
+  let el = document.getElementById(id);
+  el.innerHTML = "";
+
+  function typing() {
+    if (i < text.length) {
+      el.innerHTML += text.charAt(i);
+      i++;
+      setTimeout(typing, 10);
+    }
+  }
+
+  typing();
 }
 </script>
 
