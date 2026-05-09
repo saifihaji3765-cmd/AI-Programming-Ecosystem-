@@ -1,40 +1,110 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>AI Code Mentor</title>
+  <title>AI Dev Mentor Ultra</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial;
+      background: #0f172a;
+      color: white;
+      display: flex;
+      height: 100vh;
+    }
+
+    .left {
+      width: 40%;
+      padding: 20px;
+      background: #111827;
+    }
+
+    .right {
+      width: 60%;
+      padding: 20px;
+      overflow-y: scroll;
+    }
+
+    textarea {
+      width: 100%;
+      height: 300px;
+      background: #1f2937;
+      color: white;
+      border: none;
+      padding: 10px;
+    }
+
+    button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      background: #3b82f6;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    .box {
+      background: #1f2937;
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 8px;
+    }
+
+    h2 {
+      margin-top: 0;
+    }
+  </style>
 </head>
 <body>
 
-<h1>AI Code Debugger</h1>
+<div class="left">
+  <h2>💻 AI Code Editor</h2>
 
-<textarea id="code" rows="10" cols="50" placeholder="Paste your code here"></textarea><br>
-
-<select id="language">
+  <select id="lang">
     <option>javascript</option>
     <option>python</option>
     <option>java</option>
     <option>cpp</option>
-</select>
+  </select>
 
-<button onclick="analyzeCode()">Analyze</button>
+  <textarea id="code" placeholder="Paste your code here..."></textarea>
 
-<pre id="output"></pre>
+  <button onclick="analyze()">Analyze Code</button>
+</div>
+
+<div class="right">
+  <h2>🧠 AI Output Panel</h2>
+
+  <div class="box" id="issues">Issues: -</div>
+  <div class="box" id="fixes">Fixes: -</div>
+  <div class="box" id="explanation">Explanation: -</div>
+  <div class="box" id="fullcode">Fixed Code: -</div>
+</div>
 
 <script>
-async function analyzeCode() {
-    let code = document.getElementById("code").value;
-    let language = document.getElementById("language").value;
+async function analyze() {
+  let code = document.getElementById("code").value;
+  let language = document.getElementById("lang").value;
 
-    let res = await fetch("/analyze", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ code, language })
-    });
+  let res = await fetch("/analyze", {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({ code, language })
+  });
 
-    let data = await res.json();
+  let data = await res.json();
 
-    document.getElementById("output").innerText =
-        JSON.stringify(data, null, 2);
+  document.getElementById("issues").innerText =
+    "Issues: " + (data.issues?.join("\n") || "None");
+
+  document.getElementById("fixes").innerText =
+    "Fixes: " + (data.fixes?.join("\n") || "None");
+
+  document.getElementById("explanation").innerText =
+    "Explanation: " + (data.explanation?.join("\n") || "None");
+
+  document.getElementById("fullcode").innerText =
+    "Fixed Code: " + (data.fixedCode || "Not generated yet");
 }
 </script>
 
