@@ -1,64 +1,20 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>AI Dev Mentor Ultra</title>
+  <title>AI Code Debugger Pro</title>
   <style>
-    body {
-      margin: 0;
-      font-family: Arial;
-      background: #0f172a;
-      color: white;
-      display: flex;
-      height: 100vh;
-    }
-
-    .left {
-      width: 40%;
-      padding: 20px;
-      background: #111827;
-    }
-
-    .right {
-      width: 60%;
-      padding: 20px;
-      overflow-y: scroll;
-    }
-
-    textarea {
-      width: 100%;
-      height: 300px;
-      background: #1f2937;
-      color: white;
-      border: none;
-      padding: 10px;
-    }
-
-    button {
-      width: 100%;
-      padding: 10px;
-      margin-top: 10px;
-      background: #3b82f6;
-      color: white;
-      border: none;
-      cursor: pointer;
-    }
-
-    .box {
-      background: #1f2937;
-      padding: 10px;
-      margin-bottom: 10px;
-      border-radius: 8px;
-    }
-
-    h2 {
-      margin-top: 0;
-    }
+    body { font-family: Arial; background:#0f172a; color:white; display:flex; }
+    .left { width:40%; padding:20px; }
+    .right { width:60%; padding:20px; }
+    textarea { width:100%; height:300px; }
+    button { width:100%; padding:10px; margin-top:10px; }
+    .box { background:#1f2937; padding:10px; margin-bottom:10px; }
   </style>
 </head>
 <body>
 
 <div class="left">
-  <h2>💻 AI Code Editor</h2>
+  <h2>AI Code Editor</h2>
 
   <select id="lang">
     <option>javascript</option>
@@ -67,22 +23,22 @@
     <option>cpp</option>
   </select>
 
-  <textarea id="code" placeholder="Paste your code here..."></textarea>
+  <textarea id="code"></textarea>
 
-  <button onclick="analyze()">Analyze Code</button>
+  <button onclick="run()">Analyze Code</button>
 </div>
 
 <div class="right">
-  <h2>🧠 AI Output Panel</h2>
+  <h2>AI Output</h2>
 
-  <div class="box" id="issues">Issues: -</div>
-  <div class="box" id="fixes">Fixes: -</div>
-  <div class="box" id="explanation">Explanation: -</div>
-  <div class="box" id="fullcode">Fixed Code: -</div>
+  <div class="box" id="issues">Issues</div>
+  <div class="box" id="fixes">Fixes</div>
+  <div class="box" id="explanation">Explanation</div>
+  <div class="box" id="fixed">Fixed Code</div>
 </div>
 
 <script>
-async function analyze() {
+async function run() {
   let code = document.getElementById("code").value;
   let language = document.getElementById("lang").value;
 
@@ -95,16 +51,16 @@ async function analyze() {
   let data = await res.json();
 
   document.getElementById("issues").innerText =
-    "Issues: " + (data.issues?.join("\n") || "None");
+    "Issues:\n" + (data.issues?.join("\n") || "None");
 
   document.getElementById("fixes").innerText =
-    "Fixes: " + (data.fixes?.join("\n") || "None");
+    "Fixes:\n" + (data.fixes?.join("\n") || "None");
 
   document.getElementById("explanation").innerText =
-    "Explanation: " + (data.explanation?.join("\n") || "None");
+    "Explanation:\n" + (data.explanation?.join("\n") || "None");
 
-  document.getElementById("fullcode").innerText =
-    "Fixed Code: " + (data.fixedCode || "Not generated yet");
+  document.getElementById("fixed").innerText =
+    "Fixed Code:\n" + (data.fixedCode || "Not generated");
 }
 </script>
 
