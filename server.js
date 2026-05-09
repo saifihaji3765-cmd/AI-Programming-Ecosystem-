@@ -17,8 +17,10 @@ function safeJSONParse(text) {
     return JSON.parse(text);
   } catch (e) {
     const match = text.match(/\{[\s\S]*\}/);
-    if (match) return JSON.parse(match[0]);
-    throw new Error("Invalid AI response");
+    if (match) {
+      return JSON.parse(match[0]);
+    }
+    throw new Error("Invalid AI response format");
   }
 }
 
@@ -27,7 +29,7 @@ app.post("/analyze", async (req, res) => {
     const { code, language } = req.body;
 
     const prompt = `
-You are an expert senior developer AI.
+You are a senior software engineer AI.
 
 Return ONLY valid JSON:
 
@@ -38,7 +40,8 @@ Return ONLY valid JSON:
   "fixedCode": ""
 }
 
-Code:
+Analyze this ${language} code:
+
 ${code}
 `;
 
@@ -48,14 +51,17 @@ ${code}
     });
 
     const content = response.choices[0].message.content;
+
     const result = safeJSONParse(content);
 
     res.json(result);
 
   } catch (err) {
+    console.error(err);
+
     res.status(500).json({
       issues: ["Server error"],
-      fixes: ["Check API or logs"],
+      fixes: ["Check API key or logs"],
       explanation: [err.message],
       fixedCode: ""
     });
