@@ -281,7 +281,7 @@ pre{
 
     <textarea
       id="prompt"
-      placeholder="Ask AI to build or debug anything..."
+      placeholder="Ask AI to build or review anything..."
     ></textarea>
 
     <div class="controls">
@@ -294,6 +294,10 @@ pre{
 
         <option value="project">
           🏗 Generate Project
+        </option>
+
+        <option value="review">
+          🧠 Engineering Review
         </option>
 
       </select>
@@ -457,71 +461,6 @@ async function loadActiveProject(){
         "activeProjectName"
       ).innerText = data.projectName;
 
-      let filesHTML = "";
-
-      data.files.forEach((file,index) => {
-
-        const fileId =
-          "memory_file_" +
-          index +
-          "_" +
-          Date.now();
-
-        filesHTML += `
-
-          <div class="section">
-
-            <div class="section-title">
-              📄 ${file.name}
-            </div>
-
-            <div class="code-box">
-
-              <div class="code-top">
-
-                <div>
-                  Active Project File
-                </div>
-
-                <button
-                  class="copy-btn"
-                  onclick="copyCode('${fileId}')"
-                >
-                  Copy
-                </button>
-
-              </div>
-
-              <pre id="${fileId}">
-${file.content}
-              </pre>
-
-            </div>
-
-          </div>
-
-        `;
-
-      });
-
-      addHTML(`
-
-        <div class="section">
-
-          <div class="section-title">
-            🟢 Active Project Loaded
-          </div>
-
-          <pre>
-${data.projectName}
-          </pre>
-
-        </div>
-
-        ${filesHTML}
-
-      `);
-
     }
 
   } catch (err) {
@@ -656,6 +595,117 @@ ${data.fixedCode || "No fixed code generated"}
 
     saveHistory(
       "🐞 Code Analysis",
+      html
+    );
+
+  }
+
+  /* =========================
+     ENGINEERING REVIEW MODE
+  ========================= */
+
+  if(mode === "review"){
+
+    const res = await fetch(
+      "/engineering-review",
+      {
+
+        method:"POST",
+
+        headers:{
+          "Content-Type":"application/json"
+        },
+
+        body:JSON.stringify({
+          code:prompt,
+          language
+        })
+
+      }
+    );
+
+    const data = await res.json();
+
+    const html = `
+
+      <div class="section">
+
+        <div class="section-title">
+          🔒 Security Issues
+        </div>
+
+        <pre>
+${(data.securityIssues || []).join("\n\n")}
+        </pre>
+
+      </div>
+
+      <div class="section">
+
+        <div class="section-title">
+          ⚡ Performance Issues
+        </div>
+
+        <pre>
+${(data.performanceIssues || []).join("\n\n")}
+        </pre>
+
+      </div>
+
+      <div class="section">
+
+        <div class="section-title">
+          📈 Scalability Review
+        </div>
+
+        <pre>
+${(data.scalabilityIssues || []).join("\n\n")}
+        </pre>
+
+      </div>
+
+      <div class="section">
+
+        <div class="section-title">
+          🏗 Architecture Review
+        </div>
+
+        <pre>
+${(data.architectureReview || []).join("\n\n")}
+        </pre>
+
+      </div>
+
+      <div class="section">
+
+        <div class="section-title">
+          ✅ Best Practices
+        </div>
+
+        <pre>
+${(data.bestPractices || []).join("\n\n")}
+        </pre>
+
+      </div>
+
+      <div class="section">
+
+        <div class="section-title">
+          🚀 Production Recommendations
+        </div>
+
+        <pre>
+${(data.productionRecommendations || []).join("\n\n")}
+        </pre>
+
+      </div>
+
+    `;
+
+    addHTML(html);
+
+    saveHistory(
+      "🧠 Engineering Review",
       html
     );
 
