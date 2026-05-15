@@ -16,10 +16,25 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
+/* =========================
+   ACTIVE PROJECT MEMORY
+========================= */
+
+let activeProject = {
+  projectName: "",
+  files: []
+};
+
+/* =========================
+   SAFE JSON PARSER
+========================= */
+
 function safeJSONParse(text) {
 
   try {
+
     return JSON.parse(text);
+
   } catch (e) {
 
     const match = text.match(/\{[\s\S]*\}/);
@@ -29,11 +44,13 @@ function safeJSONParse(text) {
     }
 
     throw new Error("Invalid AI response format");
+
   }
+
 }
 
 /* =========================
-   AI ANALYZE
+   AI CODE ANALYZER
 ========================= */
 
 app.post("/analyze", async (req, res) => {
@@ -60,16 +77,20 @@ ${code}
 `;
 
     const response = await openai.chat.completions.create({
+
       model: "gpt-4o-mini",
+
       messages: [
         {
           role: "user",
           content: prompt
         }
       ]
+
     });
 
-    const content = response.choices[0].message.content;
+    const content =
+      response.choices[0].message.content;
 
     const result = safeJSONParse(content);
 
@@ -80,10 +101,15 @@ ${code}
     console.error(err);
 
     res.status(500).json({
+
       issues: ["Server error"],
-      fixes: ["Check API or logs"],
+
+      fixes: ["Check API key or logs"],
+
       explanation: [err.message],
+
       fixedCode: ""
+
     });
 
   }
@@ -91,7 +117,7 @@ ${code}
 });
 
 /* =========================
-   PROJECT GENERATOR
+   AI PROJECT GENERATOR
 ========================= */
 
 app.post("/generate-project", async (req, res) => {
@@ -122,42 +148,64 @@ Return ONLY valid JSON:
 IMPORTANT:
 - Generate REAL code
 - Include multiple files
-- Include package.json
 - Include frontend + backend
+- Include package.json
+- Make production-ready structure
 
 Project Idea:
 ${idea}
 `;
 
     const response = await openai.chat.completions.create({
+
       model: "gpt-4o-mini",
+
       messages: [
         {
           role: "user",
           content: prompt
         }
       ]
+
     });
 
-    const content = response.choices[0].message.content;
+    const content =
+      response.choices[0].message.content;
 
     const result = safeJSONParse(content);
 
     /* =========================
-       CREATE TEMP PROJECT
+       SAVE ACTIVE PROJECT
     ========================= */
 
-    const projectDir = path.join(__dirname, "temp_project");
+    activeProject = result;
+
+    /* =========================
+       CREATE TEMP FOLDER
+    ========================= */
+
+    const projectDir =
+      path.join(__dirname, "temp_project");
 
     if (!fs.existsSync(projectDir)) {
+
       fs.mkdirSync(projectDir);
+
     }
+
+    /* =========================
+       WRITE FILES
+    ========================= */
 
     result.files.forEach(file => {
 
-      const filePath = path.join(projectDir, file.name);
+      const filePath =
+        path.join(projectDir, file.name);
 
-      fs.writeFileSync(filePath, file.content);
+      fs.writeFileSync(
+        filePath,
+        file.content
+      );
 
     });
 
@@ -165,9 +213,11 @@ ${idea}
        CREATE ZIP
     ========================= */
 
-    const zipPath = path.join(__dirname, "project.zip");
+    const zipPath =
+      path.join(__dirname, "project.zip");
 
-    const output = fs.createWriteStream(zipPath);
+    const output =
+      fs.createWriteStream(zipPath);
 
     const archive = archiver("zip", {
       zlib: { level: 9 }
@@ -179,18 +229,13 @@ ${idea}
 
     archive.finalize();
 
-output.on("close", () => {
+    output.on("close", () => {
 
-  res.json({
-    ...result,
-    download: "/download-project"
-  });
+      res.json({
+        ...result,
+        download: "/download-project"
+      });
 
-});
-
-    res.json({
-      ...result,
-      download: "/download-project"
     });
 
   } catch (err) {
@@ -198,13 +243,53 @@ output.on("close", () => {
     console.error(err);
 
     res.status(500).json({
+
       projectName: "Error",
+
       files: [],
+
       setupGuide: err.message,
+
       deployGuide: ""
+
     });
 
   }
+
+});
+
+/* =========================
+   SAVE PROJECT MEMORY
+========================= */
+
+app.post("/save-project-memory", (req, res) => {
+
+  try {
+
+    activeProject = req.body;
+
+    res.json({
+      success: true,
+      message: "Project memory saved"
+    });
+
+  } catch (err) {
+
+    res.status(500).json({
+      success: false
+    });
+
+  }
+
+});
+
+/* =========================
+   GET PROJECT MEMORY
+========================= */
+
+app.get("/get-project-memory", (req, res) => {
+
+  res.json(activeProject);
 
 });
 
@@ -214,7 +299,8 @@ output.on("close", () => {
 
 app.get("/download-project", (req, res) => {
 
-  const zipPath = path.join(__dirname, "project.zip");
+  const zipPath =
+    path.join(__dirname, "project.zip");
 
   if (fs.existsSync(zipPath)) {
 
@@ -233,5 +319,9 @@ app.get("/download-project", (req, res) => {
 ========================= */
 
 app.listen(3000, () => {
-  console.log("AI Dev Mentor Pro Running 🚀");
+
+  console.log(
+    "🚀 AI Dev Mentor Pro Running"
+  );
+
 });
