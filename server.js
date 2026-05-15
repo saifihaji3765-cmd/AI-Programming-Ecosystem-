@@ -13,7 +13,7 @@ app.use(express.json());
 app.use(express.static("public"));
 
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
+  apiKey: process.env.OPENAI_API_KEY
 });
 
 /* =========================
@@ -30,13 +30,9 @@ let activeProject = {
 ========================= */
 
 function safeJSONParse(text) {
-
   try {
-
     return JSON.parse(text);
-
   } catch (e) {
-
     const match = text.match(/\{[\s\S]*\}/);
 
     if (match) {
@@ -44,9 +40,7 @@ function safeJSONParse(text) {
     }
 
     throw new Error("Invalid AI response format");
-
   }
-
 }
 
 /* =========================
@@ -54,9 +48,7 @@ function safeJSONParse(text) {
 ========================= */
 
 app.post("/analyze", async (req, res) => {
-
   try {
-
     const { code, language } = req.body;
 
     const prompt = `
@@ -76,44 +68,102 @@ Analyze this ${language} code:
 ${code}
 `;
 
-    const response = await openai.chat.completions.create({
-
-      model: "gpt-4o-mini",
-
-      messages: [
-        {
-          role: "user",
-          content: prompt
-        }
-      ]
-
-    });
+    const response =
+      await openai.chat.completions.create({
+        model: "gpt-4o-mini",
+        messages: [
+          {
+            role: "user",
+            content: prompt
+          }
+        ]
+      });
 
     const content =
       response.choices[0].message.content;
 
-    const result = safeJSONParse(content);
+    const result =
+      safeJSONParse(content);
 
     res.json(result);
 
   } catch (err) {
-
     console.error(err);
 
     res.status(500).json({
-
       issues: ["Server error"],
-
       fixes: ["Check API key or logs"],
-
       explanation: [err.message],
-
       fixedCode: ""
-
     });
-
   }
+});
 
+/* =========================
+   ENGINEERING REVIEW MODE
+========================= */
+
+app.post("/engineering-review", async (req, res) => {
+  try {
+    const { code, language } = req.body;
+
+    const prompt = `
+You are a world-class software architect and senior engineering reviewer.
+
+Analyze this ${language} code deeply.
+
+Return ONLY valid JSON:
+
+{
+  "securityIssues": [],
+  "performanceIssues": [],
+  "scalabilityIssues": [],
+  "architectureReview": [],
+  "bestPractices": [],
+  "productionRecommendations": []
+}
+
+IMPORTANT:
+- Think like a senior engineer
+- Give professional analysis
+- Mention real-world improvements
+- Explain clearly
+
+CODE:
+${code}
+`;
+
+    const response =
+      await openai.chat.completions.create({
+        model: "gpt-4o-mini",
+        messages: [
+          {
+            role: "user",
+            content: prompt
+          }
+        ]
+      });
+
+    const content =
+      response.choices[0].message.content;
+
+    const result =
+      safeJSONParse(content);
+
+    res.json(result);
+
+  } catch (err) {
+    console.error(err);
+
+    res.status(500).json({
+      securityIssues: ["Server error"],
+      performanceIssues: [],
+      scalabilityIssues: [],
+      architectureReview: [err.message],
+      bestPractices: [],
+      productionRecommendations: []
+    });
+  }
 });
 
 /* =========================
@@ -121,9 +171,7 @@ ${code}
 ========================= */
 
 app.post("/generate-project", async (req, res) => {
-
   try {
-
     const { idea } = req.body;
 
     const prompt = `
@@ -147,58 +195,41 @@ Return ONLY valid JSON:
 
 IMPORTANT:
 - Generate REAL code
-- Include multiple files
 - Include frontend + backend
 - Include package.json
-- Make production-ready structure
+- Make production-ready
 
 Project Idea:
 ${idea}
 `;
 
-    const response = await openai.chat.completions.create({
-
-      model: "gpt-4o-mini",
-
-      messages: [
-        {
-          role: "user",
-          content: prompt
-        }
-      ]
-
-    });
+    const response =
+      await openai.chat.completions.create({
+        model: "gpt-4o-mini",
+        messages: [
+          {
+            role: "user",
+            content: prompt
+          }
+        ]
+      });
 
     const content =
       response.choices[0].message.content;
 
-    const result = safeJSONParse(content);
-
-    /* =========================
-       SAVE ACTIVE PROJECT
-    ========================= */
+    const result =
+      safeJSONParse(content);
 
     activeProject = result;
-
-    /* =========================
-       CREATE TEMP FOLDER
-    ========================= */
 
     const projectDir =
       path.join(__dirname, "temp_project");
 
     if (!fs.existsSync(projectDir)) {
-
       fs.mkdirSync(projectDir);
-
     }
 
-    /* =========================
-       WRITE FILES
-    ========================= */
-
     result.files.forEach(file => {
-
       const filePath =
         path.join(projectDir, file.name);
 
@@ -206,12 +237,7 @@ ${idea}
         filePath,
         file.content
       );
-
     });
-
-    /* =========================
-       CREATE ZIP
-    ========================= */
 
     const zipPath =
       path.join(__dirname, "project.zip");
@@ -219,9 +245,10 @@ ${idea}
     const output =
       fs.createWriteStream(zipPath);
 
-    const archive = archiver("zip", {
-      zlib: { level: 9 }
-    });
+    const archive =
+      archiver("zip", {
+        zlib: { level: 9 }
+      });
 
     archive.pipe(output);
 
@@ -230,32 +257,22 @@ ${idea}
     archive.finalize();
 
     output.on("close", () => {
-
       res.json({
         ...result,
         download: "/download-project"
       });
-
     });
 
   } catch (err) {
-
     console.error(err);
 
     res.status(500).json({
-
       projectName: "Error",
-
       files: [],
-
       setupGuide: err.message,
-
       deployGuide: ""
-
     });
-
   }
-
 });
 
 /* =========================
@@ -263,9 +280,7 @@ ${idea}
 ========================= */
 
 app.post("/save-project-memory", (req, res) => {
-
   try {
-
     activeProject = req.body;
 
     res.json({
@@ -274,13 +289,10 @@ app.post("/save-project-memory", (req, res) => {
     });
 
   } catch (err) {
-
     res.status(500).json({
       success: false
     });
-
   }
-
 });
 
 /* =========================
@@ -288,9 +300,7 @@ app.post("/save-project-memory", (req, res) => {
 ========================= */
 
 app.get("/get-project-memory", (req, res) => {
-
   res.json(activeProject);
-
 });
 
 /* =========================
@@ -298,20 +308,16 @@ app.get("/get-project-memory", (req, res) => {
 ========================= */
 
 app.get("/download-project", (req, res) => {
-
   const zipPath =
     path.join(__dirname, "project.zip");
 
   if (fs.existsSync(zipPath)) {
-
     res.download(zipPath);
-
   } else {
-
-    res.status(404).send("ZIP file not found");
-
+    res.status(404).send(
+      "ZIP file not found"
+    );
   }
-
 });
 
 /* =========================
@@ -319,9 +325,7 @@ app.get("/download-project", (req, res) => {
 ========================= */
 
 app.listen(3000, () => {
-
   console.log(
     "🚀 AI Dev Mentor Pro Running"
   );
-
 });
