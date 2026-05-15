@@ -3,7 +3,7 @@
 
 <head>
 
-<meta charset="UTF-8"/>
+<meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
 <title>AI Dev Mentor Pro</title>
@@ -24,8 +24,12 @@ body{
   display:flex;
 }
 
+/* =========================
+   SIDEBAR
+========================= */
+
 .sidebar{
-  width:280px;
+  width:260px;
   background:#111827;
   border-right:1px solid #1f2937;
   display:flex;
@@ -47,22 +51,25 @@ body{
 
 .history-title{
   color:#60a5fa;
-  margin-bottom:18px;
+  margin-bottom:16px;
   font-size:18px;
 }
 
 .history-item{
   background:#1f2937;
   padding:14px;
-  border-radius:14px;
+  border-radius:12px;
   margin-bottom:12px;
   cursor:pointer;
-  transition:0.2s;
 }
 
 .history-item:hover{
   background:#374151;
 }
+
+/* =========================
+   MAIN
+========================= */
 
 .main{
   flex:1;
@@ -83,13 +90,17 @@ body{
 
 .welcome h1{
   font-size:42px;
-  margin-bottom:14px;
+  margin-bottom:12px;
 }
 
 .welcome p{
   color:#94a3b8;
   font-size:18px;
 }
+
+/* =========================
+   INPUT AREA
+========================= */
 
 .input-area{
   background:#111827;
@@ -105,7 +116,7 @@ textarea{
   border:none;
   outline:none;
   resize:none;
-  border-radius:18px;
+  border-radius:16px;
   padding:18px;
   font-size:16px;
 }
@@ -122,7 +133,7 @@ button{
   color:white;
   border:none;
   padding:12px 18px;
-  border-radius:12px;
+  border-radius:10px;
   cursor:pointer;
   font-weight:bold;
 }
@@ -139,28 +150,32 @@ select{
   border-radius:10px;
 }
 
+/* =========================
+   OUTPUT
+========================= */
+
 .message{
   background:#111827;
   border:1px solid #1f2937;
-  border-radius:20px;
+  border-radius:18px;
   padding:22px;
   margin-bottom:22px;
 }
 
 .section{
-  margin-top:24px;
+  margin-top:22px;
 }
 
 .section-title{
   color:#60a5fa;
   font-size:20px;
-  margin-bottom:12px;
+  margin-bottom:10px;
 }
 
 .code-box{
   background:#020617;
   border:1px solid #334155;
-  border-radius:16px;
+  border-radius:14px;
   overflow:hidden;
 }
 
@@ -176,7 +191,7 @@ select{
 .copy-btn{
   background:#2563eb;
   padding:8px 12px;
-  border-radius:10px;
+  border-radius:8px;
   font-size:14px;
 }
 
@@ -193,25 +208,32 @@ pre{
   background:#16a34a;
   color:white;
   text-decoration:none;
-  padding:14px 20px;
-  border-radius:12px;
+  padding:14px 18px;
+  border-radius:10px;
   margin-top:20px;
   font-weight:bold;
 }
 
-.active-project-box{
+/* =========================
+   ACTIVE PROJECT
+========================= */
+
+.active-project{
   background:#0f172a;
   border:1px solid #334155;
-  padding:16px;
-  border-radius:14px;
+  border-radius:12px;
+  padding:14px;
   margin-bottom:18px;
 }
 
 .active-project-title{
   color:#22c55e;
-  margin-bottom:10px;
-  font-size:18px;
+  margin-bottom:8px;
 }
+
+/* =========================
+   MOBILE
+========================= */
 
 @media(max-width:900px){
 
@@ -231,6 +253,10 @@ pre{
 
 <body>
 
+<!-- =========================
+     SIDEBAR
+========================= -->
+
 <div class="sidebar">
 
   <div class="logo">
@@ -239,20 +265,20 @@ pre{
 
   <div class="history">
 
-    <div class="active-project-box">
+    <div class="active-project">
 
       <div class="active-project-title">
         🟢 Active Project
       </div>
 
       <div id="activeProjectName">
-        No active project
+        No project loaded
       </div>
 
     </div>
 
     <div class="history-title">
-      📂 Previous Projects
+      📂 History
     </div>
 
     <div id="historyList"></div>
@@ -260,6 +286,10 @@ pre{
   </div>
 
 </div>
+
+<!-- =========================
+     MAIN
+========================= -->
 
 <div class="main">
 
@@ -270,18 +300,22 @@ pre{
       <h1>Build Anything with AI</h1>
 
       <p>
-        Debug code, generate projects and build complete software systems.
+        Generate projects, review architecture and evolve apps with AI.
       </p>
 
     </div>
 
   </div>
 
+  <!-- =========================
+       INPUT AREA
+  ========================= -->
+
   <div class="input-area">
 
     <textarea
       id="prompt"
-      placeholder="Ask AI to build or review anything..."
+      placeholder="Ask AI anything..."
     ></textarea>
 
     <div class="controls">
@@ -300,6 +334,10 @@ pre{
           🧠 Engineering Review
         </option>
 
+        <option value="edit">
+          ✏ Edit Project
+        </option>
+
       </select>
 
       <select id="language">
@@ -316,7 +354,7 @@ pre{
       </button>
 
       <button onclick="clearHistory()">
-        🗑 Clear History
+        🗑 Clear
       </button>
 
     </div>
@@ -326,6 +364,10 @@ pre{
 </div>
 
 <script>
+
+/* =========================
+   HISTORY
+========================= */
 
 let historyData = JSON.parse(
   localStorage.getItem("ai_history")
@@ -389,13 +431,13 @@ function renderHistory(){
 
 function clearHistory(){
 
-  localStorage.removeItem("ai_history");
+  localStorage.removeItem(
+    "ai_history"
+  );
 
   historyData = [];
 
   renderHistory();
-
-  alert("History cleared");
 
 }
 
@@ -410,7 +452,7 @@ function copyCode(id){
 
   navigator.clipboard.writeText(text);
 
-  alert("Code copied");
+  alert("Copied");
 
 }
 
@@ -432,7 +474,8 @@ function addHTML(html){
 
   chat.appendChild(div);
 
-  chat.scrollTop = chat.scrollHeight;
+  chat.scrollTop =
+    chat.scrollHeight;
 
 }
 
@@ -444,26 +487,27 @@ async function loadActiveProject(){
 
   try {
 
-    const res = await fetch(
-      "/get-project-memory"
-    );
+    const res =
+      await fetch(
+        "/get-project-memory"
+      );
 
-    const data = await res.json();
+    const data =
+      await res.json();
 
     if(
       data &&
-      data.projectName &&
-      data.files &&
-      data.files.length > 0
+      data.projectName
     ){
 
       document.getElementById(
         "activeProjectName"
-      ).innerText = data.projectName;
+      ).innerText =
+        data.projectName;
 
     }
 
-  } catch (err) {
+  } catch(err){
 
     console.log(err);
 
@@ -478,54 +522,61 @@ async function loadActiveProject(){
 async function runAI(){
 
   const prompt =
-    document.getElementById("prompt").value;
+    document.getElementById(
+      "prompt"
+    ).value;
 
   const mode =
-    document.getElementById("mode").value;
+    document.getElementById(
+      "mode"
+    ).value;
 
   const language =
-    document.getElementById("language").value;
+    document.getElementById(
+      "language"
+    ).value;
 
   addHTML(`
-
     <div class="section-title">
-      🧠 AI is thinking...
+      🧠 AI Thinking...
     </div>
-
   `);
 
   /* =========================
-     ANALYZE MODE
+     ANALYZE CODE
   ========================= */
 
   if(mode === "analyze"){
 
-    const res = await fetch("/analyze", {
+    const res =
+      await fetch("/analyze", {
 
-      method:"POST",
+        method:"POST",
 
-      headers:{
-        "Content-Type":"application/json"
-      },
+        headers:{
+          "Content-Type":
+          "application/json"
+        },
 
-      body:JSON.stringify({
-        code:prompt,
-        language
-      })
+        body:JSON.stringify({
+          code:prompt,
+          language
+        })
 
-    });
+      });
 
-    const data = await res.json();
+    const data =
+      await res.json();
 
-    const fixedId =
-      "fixed_" + Date.now();
+    const codeId =
+      "fix_" + Date.now();
 
     const html = `
 
       <div class="section">
 
         <div class="section-title">
-          🐞 Problems Found
+          🐞 Problems
         </div>
 
         <pre>
@@ -537,7 +588,7 @@ ${(data.issues || []).join("\n\n")}
       <div class="section">
 
         <div class="section-title">
-          ⚡ Best Fixes
+          ⚡ Fixes
         </div>
 
         <pre>
@@ -561,7 +612,7 @@ ${(data.explanation || []).join("\n\n")}
       <div class="section">
 
         <div class="section-title">
-          💻 Final Corrected Code
+          💻 Fixed Code
         </div>
 
         <div class="code-box">
@@ -574,15 +625,15 @@ ${(data.explanation || []).join("\n\n")}
 
             <button
               class="copy-btn"
-              onclick="copyCode('${fixedId}')"
+              onclick="copyCode('${codeId}')"
             >
               Copy
             </button>
 
           </div>
 
-          <pre id="${fixedId}">
-${data.fixedCode || "No fixed code generated"}
+          <pre id="${codeId}">
+${data.fixedCode || ""}
           </pre>
 
         </div>
@@ -594,44 +645,47 @@ ${data.fixedCode || "No fixed code generated"}
     addHTML(html);
 
     saveHistory(
-      "🐞 Code Analysis",
+      "💻 Analysis",
       html
     );
 
   }
 
   /* =========================
-     ENGINEERING REVIEW MODE
+     ENGINEERING REVIEW
   ========================= */
 
   if(mode === "review"){
 
-    const res = await fetch(
-      "/engineering-review",
-      {
+    const res =
+      await fetch(
+        "/engineering-review",
+        {
 
-        method:"POST",
+          method:"POST",
 
-        headers:{
-          "Content-Type":"application/json"
-        },
+          headers:{
+            "Content-Type":
+            "application/json"
+          },
 
-        body:JSON.stringify({
-          code:prompt,
-          language
-        })
+          body:JSON.stringify({
+            code:prompt,
+            language
+          })
 
-      }
-    );
+        }
+      );
 
-    const data = await res.json();
+    const data =
+      await res.json();
 
     const html = `
 
       <div class="section">
 
         <div class="section-title">
-          🔒 Security Issues
+          🔒 Security
         </div>
 
         <pre>
@@ -643,7 +697,7 @@ ${(data.securityIssues || []).join("\n\n")}
       <div class="section">
 
         <div class="section-title">
-          ⚡ Performance Issues
+          ⚡ Performance
         </div>
 
         <pre>
@@ -655,7 +709,7 @@ ${(data.performanceIssues || []).join("\n\n")}
       <div class="section">
 
         <div class="section-title">
-          📈 Scalability Review
+          📈 Scalability
         </div>
 
         <pre>
@@ -667,7 +721,7 @@ ${(data.scalabilityIssues || []).join("\n\n")}
       <div class="section">
 
         <div class="section-title">
-          🏗 Architecture Review
+          🏗 Architecture
         </div>
 
         <pre>
@@ -688,18 +742,6 @@ ${(data.bestPractices || []).join("\n\n")}
 
       </div>
 
-      <div class="section">
-
-        <div class="section-title">
-          🚀 Production Recommendations
-        </div>
-
-        <pre>
-${(data.productionRecommendations || []).join("\n\n")}
-        </pre>
-
-      </div>
-
     `;
 
     addHTML(html);
@@ -712,38 +754,42 @@ ${(data.productionRecommendations || []).join("\n\n")}
   }
 
   /* =========================
-     PROJECT MODE
+     GENERATE PROJECT
   ========================= */
 
   if(mode === "project"){
 
-    const res = await fetch(
-      "/generate-project",
-      {
+    const res =
+      await fetch(
+        "/generate-project",
+        {
 
-        method:"POST",
+          method:"POST",
 
-        headers:{
-          "Content-Type":"application/json"
-        },
+          headers:{
+            "Content-Type":
+            "application/json"
+          },
 
-        body:JSON.stringify({
-          idea:prompt
-        })
+          body:JSON.stringify({
+            idea:prompt
+          })
 
-      }
-    );
+        }
+      );
 
-    const data = await res.json();
+    const data =
+      await res.json();
 
     document.getElementById(
       "activeProjectName"
     ).innerText =
-      data.projectName || "Unnamed Project";
+      data.projectName;
 
     let filesHTML = "";
 
-    (data.files || []).forEach((file,index) => {
+    (data.files || []).forEach(
+      (file,index) => {
 
       const fileId =
         "file_" +
@@ -764,7 +810,7 @@ ${(data.productionRecommendations || []).join("\n\n")}
             <div class="code-top">
 
               <div>
-                Source File
+                File
               </div>
 
               <button
@@ -785,6 +831,7 @@ ${file.content}
         </div>
 
       `;
+
     });
 
     const html = `
@@ -792,7 +839,7 @@ ${file.content}
       <div class="section">
 
         <div class="section-title">
-          📦 Project Overview
+          📦 Project
         </div>
 
         <pre>
@@ -803,35 +850,11 @@ ${data.projectName}
 
       ${filesHTML}
 
-      <div class="section">
-
-        <div class="section-title">
-          📘 Setup Guide
-        </div>
-
-        <pre>
-${data.setupGuide}
-        </pre>
-
-      </div>
-
-      <div class="section">
-
-        <div class="section-title">
-          🌍 Deploy Guide
-        </div>
-
-        <pre>
-${data.deployGuide}
-        </pre>
-
-      </div>
-
       <a
-        class="download-btn"
         href="/download-project"
+        class="download-btn"
       >
-        ⬇ Download ZIP Project
+        ⬇ Download ZIP
       </a>
 
     `;
@@ -839,7 +862,110 @@ ${data.deployGuide}
     addHTML(html);
 
     saveHistory(
-      data.projectName || "Generated Project",
+      data.projectName,
+      html
+    );
+
+  }
+
+  /* =========================
+     EDIT PROJECT
+  ========================= */
+
+  if(mode === "edit"){
+
+    const res =
+      await fetch(
+        "/edit-project",
+        {
+
+          method:"POST",
+
+          headers:{
+            "Content-Type":
+            "application/json"
+          },
+
+          body:JSON.stringify({
+            instruction:prompt
+          })
+
+        }
+      );
+
+    const data =
+      await res.json();
+
+    let filesHTML = "";
+
+    (data.files || []).forEach(
+      (file,index) => {
+
+      const fileId =
+        "edit_" +
+        index +
+        "_" +
+        Date.now();
+
+      filesHTML += `
+
+        <div class="section">
+
+          <div class="section-title">
+            ✏ ${file.name}
+          </div>
+
+          <div class="code-box">
+
+            <div class="code-top">
+
+              <div>
+                Updated File
+              </div>
+
+              <button
+                class="copy-btn"
+                onclick="copyCode('${fileId}')"
+              >
+                Copy
+              </button>
+
+            </div>
+
+            <pre id="${fileId}">
+${file.content}
+            </pre>
+
+          </div>
+
+        </div>
+
+      `;
+
+    });
+
+    const html = `
+
+      <div class="section">
+
+        <div class="section-title">
+          🧠 Project Updated
+        </div>
+
+        <pre>
+${data.summary || ""}
+        </pre>
+
+      </div>
+
+      ${filesHTML}
+
+    `;
+
+    addHTML(html);
+
+    saveHistory(
+      "✏ Edited Project",
       html
     );
 
