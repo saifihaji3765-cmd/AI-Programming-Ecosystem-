@@ -2,6 +2,8 @@ const express = require("express");
 const dotenv = require("dotenv");
 const cors = require("cors");
 const fs = require("fs");
+const { exec } =
+  require("child_process");
 const path = require("path");
 const archiver = require("archiver");
 const { OpenAI } = require("openai");
@@ -486,6 +488,89 @@ app.post(
 
       res.status(500).json({
         success:false
+      });
+
+    }
+
+  }
+);
+/* =========================
+   TERMINAL COMMAND
+========================= */
+
+app.post(
+  "/terminal",
+  (req,res) => {
+
+    try {
+
+      const {
+        command
+      } = req.body;
+
+      if(!command){
+
+        return res.status(400).json({
+          success:false
+        });
+
+      }
+
+      exec(
+
+        command,
+
+        {
+          cwd:path.join(
+            __dirname,
+            "generated_project"
+          )
+        },
+
+        (
+          error,
+          stdout,
+          stderr
+        ) => {
+
+          if(error){
+
+            return res.json({
+
+              success:false,
+
+              output:
+                stderr ||
+                error.message
+
+            });
+
+          }
+
+          res.json({
+
+            success:true,
+
+            output:
+              stdout ||
+              "Command executed"
+
+          });
+
+        }
+
+      );
+
+    } catch(err){
+
+      console.log(err);
+
+      res.status(500).json({
+
+        success:false,
+
+        output:err.message
+
       });
 
     }
