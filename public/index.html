@@ -362,7 +362,9 @@ pre{
       <button onclick="clearHistory()">
         🗑 Clear
       </button>
-
+<button onclick="openTerminal()">
+  🖥 Terminal
+</button>
       <a
         href="/download-project"
         target="_blank"
@@ -499,7 +501,106 @@ async function streamHTML(html){
     chat.scrollHeight;
 
 }
+/* =========================
+   OPEN TERMINAL
+========================= */
 
+function openTerminal(){
+
+  const html = `
+
+    <div class="section">
+
+      <div class="section-title">
+        🖥 AI Terminal
+      </div>
+
+      <div class="code-box">
+
+        <div class="code-top">
+
+          <div>
+            generated_project
+          </div>
+
+        </div>
+
+        <textarea
+          id="terminalInput"
+          class="editor-area"
+          style="height:120px;"
+          placeholder="npm install"
+        ></textarea>
+
+        <div style="padding:15px;">
+
+          <button
+            onclick="runTerminalCommand()"
+          >
+            ▶ Run Command
+          </button>
+
+        </div>
+
+        <pre id="terminalOutput">
+Ready...
+        </pre>
+
+      </div>
+
+    </div>
+
+  `;
+
+  streamHTML(html);
+
+}
+
+/* =========================
+   RUN TERMINAL COMMAND
+========================= */
+
+async function runTerminalCommand(){
+
+  const command =
+    document.getElementById(
+      "terminalInput"
+    ).value;
+
+  const output =
+    document.getElementById(
+      "terminalOutput"
+    );
+
+  output.innerText =
+    "Running command...";
+
+  const res =
+    await fetch(
+      "/terminal",
+      {
+
+        method:"POST",
+
+        headers:{
+          "Content-Type":
+          "application/json"
+        },
+
+        body:JSON.stringify({
+          command
+        })
+
+      }
+    );
+
+  const data =
+    await res.json();
+
+  output.innerText =
+    data.output;
+
+}
 /* =========================
    SAVE FILE
 ========================= */
