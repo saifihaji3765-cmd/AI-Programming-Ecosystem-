@@ -1,16 +1,30 @@
 const express = require("express");
 const dotenv = require("dotenv");
-const { OpenAI } = require("openai");
+const cors = require("cors");
 const fs = require("fs");
 const path = require("path");
 const archiver = require("archiver");
+const { OpenAI } = require("openai");
 
 dotenv.config();
 
 const app = express();
 
-app.use(express.json({ limit: "50mb" }));
+/* =========================
+   MIDDLEWARE
+========================= */
+
+app.use(cors());
+
+app.use(express.json({
+  limit:"50mb"
+}));
+
 app.use(express.static("public"));
+
+/* =========================
+   OPENAI
+========================= */
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
@@ -21,33 +35,33 @@ const openai = new OpenAI({
 ========================= */
 
 let activeProject = {
-  projectName: "",
-  files: []
+  projectName:"",
+  files:[]
 };
 
 /* =========================
    SAFE JSON PARSER
 ========================= */
 
-function safeJSONParse(text) {
+function safeJSONParse(text){
 
   try {
 
     return JSON.parse(text);
 
-  } catch (e) {
+  } catch(err){
 
     const match =
       text.match(/\{[\s\S]*\}/);
 
-    if (match) {
+    if(match){
 
       return JSON.parse(match[0]);
 
     }
 
     throw new Error(
-      "Invalid AI response format"
+      "Invalid AI JSON response"
     );
 
   }
@@ -55,17 +69,139 @@ function safeJSONParse(text) {
 }
 
 /* =========================
-   AI CODE ANALYZER
+   SAVE PROJECT FILES
 ========================= */
 
-app.post("/analyze", async (req, res) => {
+function saveProjectFiles(
+  projectName,
+  files
+){
 
-  try {
+  const projectDir =
+    path.join(
+      __dirname,
+      "generated_project"
+    );
 
-    const { code, language } = req.body;
+  if(
+    fs.existsSync(projectDir)
+  ){
 
-    const prompt = `
-You are a senior software engineer AI.
+    fs.rmSync(
+      projectDir,
+      {
+        recursive:true,
+        force:true
+      }
+    );
+
+  }
+
+  fs.mkdirSync(
+    projectDir,
+    {
+      recursive:true
+    }
+  );
+
+  files.forEach(file => {
+
+    const filePath =
+      path.join(
+        projectDir,
+        file.name
+      );
+
+    const dir =
+      path.dirname(filePath);
+
+    fs.mkdirSync(
+      dir,
+      {
+        recursive:true
+      }
+    );
+
+    fs.writeFileSync(
+      filePath,
+      file.content || ""
+    );
+
+  });
+
+}
+
+/* =========================
+   CREATE ZIP
+========================= */
+
+function createZip(){
+
+  return new Promise(
+    (resolve,reject) => {
+
+      const output =
+        fs.createWriteStream(
+          path.join(
+            __dirname,
+            "project.zip"
+          )
+        );
+
+      const archive =
+        archiver("zip", {
+          zlib:{
+            level:9
+          }
+        });
+
+      output.on(
+        "close",
+        () => resolve()
+      );
+
+      archive.on(
+        "error",
+        err => reject(err)
+      );
+
+      archive.pipe(output);
+
+      archive.directory(
+        path.join(
+          __dirname,
+          "generated_project"
+        ),
+        false
+      );
+
+      archive.finalize();
+
+    }
+  );
+
+}
+
+/* =========================
+   ANALYZE CODE
+========================= */
+
+app.post(
+  "/analyze",
+  async (req,res) => {
+
+    try {
+
+      const {
+        code,
+        language
+      } = req.body;
+
+      const prompt = `
+
+You are an elite senior software engineer.
+
+Analyze the following code.
 
 Return ONLY valid JSON:
 
@@ -76,431 +212,267 @@ Return ONLY valid JSON:
   "fixedCode": ""
 }
 
-Analyze this ${language} code:
+Language:
+${language}
 
+Code:
 ${code}
+
 `;
 
-    const response =
-      await openai.chat.completions.create({
+      const response =
+        await openai.chat.completions.create({
 
-        model: "gpt-4o-mini",
+          model:"gpt-4.1-mini",
 
-        messages: [
-          {
-            role: "user",
-            content: prompt
-          }
-        ]
+          messages:[
+            {
+              role:"user",
+              content:prompt
+            }
+          ],
+
+          temperature:0.2
+
+        });
+
+      const content =
+        response
+        .choices[0]
+        .message
+        .content;
+
+      const result =
+        safeJSONParse(content);
+
+      res.json(result);
+
+    } catch(err){
+
+      console.log(err);
+
+      res.status(500).json({
+
+        issues:[
+          "Server error"
+        ],
+
+        fixes:[
+          "Check API key or logs"
+        ],
+
+        explanation:[
+          err.message
+        ],
+
+        fixedCode:""
 
       });
 
-    const content =
-      response.choices[0].message.content;
-
-    const result =
-      safeJSONParse(content);
-
-    res.json(result);
-
-  } catch (err) {
-
-    console.error(err);
-
-    res.status(500).json({
-
-      issues: ["Server error"],
-
-      fixes: ["Check API key or logs"],
-
-      explanation: [err.message],
-
-      fixedCode: ""
-
-    });
+    }
 
   }
-
-});
-
-/* =========================
-   ENGINEERING REVIEW MODE
-========================= */
-
-app.post("/engineering-review", async (req, res) => {
-
-  try {
-
-    const { code, language } = req.body;
-
-    const prompt = `
-You are a world-class software architect and senior engineering reviewer.
-
-Analyze this ${language} code deeply.
-
-Return ONLY valid JSON:
-
-{
-  "securityIssues": [],
-  "performanceIssues": [],
-  "scalabilityIssues": [],
-  "architectureReview": [],
-  "bestPractices": [],
-  "productionRecommendations": []
-}
-
-IMPORTANT:
-- Think like a senior engineer
-- Give professional analysis
-- Mention real-world improvements
-- Explain clearly
-
-CODE:
-${code}
-`;
-
-    const response =
-      await openai.chat.completions.create({
-
-        model: "gpt-4o-mini",
-
-        messages: [
-          {
-            role: "user",
-            content: prompt
-          }
-        ]
-
-      });
-
-    const content =
-      response.choices[0].message.content;
-
-    const result =
-      safeJSONParse(content);
-
-    res.json(result);
-
-  } catch (err) {
-
-    console.error(err);
-
-    res.status(500).json({
-
-      securityIssues: ["Server error"],
-
-      performanceIssues: [],
-
-      scalabilityIssues: [],
-
-      architectureReview: [err.message],
-
-      bestPractices: [],
-
-      productionRecommendations: []
-
-    });
-
-  }
-
-});
+);
 
 /* =========================
-   AI PROJECT GENERATOR
+   GENERATE PROJECT
 ========================= */
 
-app.post("/generate-project", async (req, res) => {
+app.post(
+  "/generate-project",
+  async (req,res) => {
 
-  try {
+    try {
 
-    const { idea } = req.body;
+      const {
+        prompt
+      } = req.body;
 
-    const prompt = `
-You are a world-class senior software architect AI.
+      const aiPrompt = `
 
-Generate a COMPLETE production-ready software project.
+You are an elite full stack AI engineer.
 
-Return ONLY valid JSON:
+Generate a COMPLETE production-ready project.
+
+Return ONLY valid JSON.
+
+FORMAT:
 
 {
-  "projectName": "",
-  "files": [
+  "projectName":"",
+  "files":[
     {
-      "name": "",
-      "content": ""
+      "name":"",
+      "content":""
     }
-  ],
-  "setupGuide": "",
-  "deployGuide": ""
+  ]
 }
 
 IMPORTANT:
-- Generate REAL code
-- Include frontend + backend
-- Include package.json
-- Make production-ready
 
-Project Idea:
-${idea}
+- Generate REAL code
+- Generate MULTIPLE files
+- Include package.json
+- Include frontend
+- Include backend
+- Include styling
+- Use clean architecture
+- No markdown
+- No explanations
+- JSON ONLY
+
+PROJECT REQUEST:
+${prompt}
+
 `;
 
-    const response =
-      await openai.chat.completions.create({
+      const response =
+        await openai.chat.completions.create({
 
-        model: "gpt-4o-mini",
+          model:"gpt-4.1-mini",
 
-        messages: [
-          {
-            role: "user",
-            content: prompt
-          }
-        ]
+          messages:[
+            {
+              role:"user",
+              content:aiPrompt
+            }
+          ],
 
-      });
+          temperature:0.4
 
-    const content =
-      response.choices[0].message.content;
+        });
 
-    const result =
-      safeJSONParse(content);
+      const content =
+        response
+        .choices[0]
+        .message
+        .content;
 
-    /* =========================
-       SAVE ACTIVE PROJECT
-    ========================= */
+      const result =
+        safeJSONParse(content);
 
-    activeProject = result;
+      /* =========================
+         SAVE ACTIVE PROJECT
+      ========================= */
 
-    /* =========================
-       TEMP PROJECT FOLDER
-    ========================= */
+      activeProject = result;
 
-    const projectDir =
-      path.join(__dirname, "temp_project");
+      /* =========================
+         SAVE FILES
+      ========================= */
 
-    if (!fs.existsSync(projectDir)) {
-
-      fs.mkdirSync(projectDir);
-
-    }
-
-    /* =========================
-       WRITE FILES
-    ========================= */
-
-    result.files.forEach(file => {
-
-      const filePath =
-        path.join(projectDir, file.name);
-
-      fs.writeFileSync(
-        filePath,
-        file.content
+      saveProjectFiles(
+        result.projectName,
+        result.files
       );
 
-    });
+      /* =========================
+         CREATE ZIP
+      ========================= */
 
-    /* =========================
-       CREATE ZIP
-    ========================= */
+      await createZip();
 
-    const zipPath =
-      path.join(__dirname, "project.zip");
+      res.json(result);
 
-    const output =
-      fs.createWriteStream(zipPath);
+    } catch(err){
 
-    const archive =
-      archiver("zip", {
-        zlib: { level: 9 }
+      console.log(err);
+
+      res.status(500).json({
+
+        success:false,
+        error:err.message
+
       });
 
-    archive.pipe(output);
+    }
 
-    archive.directory(projectDir, false);
+  }
+);
 
-    archive.finalize();
+/* =========================
+   SAVE ACTIVE PROJECT
+========================= */
 
-    output.on("close", () => {
+app.post(
+  "/save-project-memory",
+  (req,res) => {
+
+    try {
+
+      activeProject =
+        req.body;
 
       res.json({
-        ...result,
-        download: "/download-project"
+        success:true
       });
 
-    });
+    } catch(err){
 
-  } catch (err) {
-
-    console.error(err);
-
-    res.status(500).json({
-
-      projectName: "Error",
-
-      files: [],
-
-      setupGuide: err.message,
-
-      deployGuide: ""
-
-    });
-
-  }
-
-});
-
-/* =========================
-   FILE EDITING ENGINE
-========================= */
-
-app.post("/edit-project", async (req, res) => {
-
-  try {
-
-    const { instruction } = req.body;
-
-    if (
-      !activeProject ||
-      !activeProject.files ||
-      activeProject.files.length === 0
-    ) {
-
-      return res.status(400).json({
-        error: "No active project loaded"
+      res.status(500).json({
+        success:false
       });
 
     }
 
-    const projectContext =
-      JSON.stringify(activeProject);
-
-    const prompt = `
-You are a senior AI software engineer.
-
-You are editing an EXISTING software project.
-
-PROJECT:
-${projectContext}
-
-USER REQUEST:
-${instruction}
-
-Return ONLY valid JSON:
-
-{
-  "projectName": "",
-  "files": [
-    {
-      "name": "",
-      "content": ""
-    }
-  ],
-  "summary": ""
-}
-
-IMPORTANT:
-- MODIFY existing files intelligently
-- Keep architecture clean
-- Only change necessary files
-- Return full updated file contents
-- Maintain production quality
-`;
-
-    const response =
-      await openai.chat.completions.create({
-
-        model: "gpt-4o-mini",
-
-        messages: [
-          {
-            role: "user",
-            content: prompt
-          }
-        ]
-
-      });
-
-    const content =
-      response.choices[0].message.content;
-
-    const result =
-      safeJSONParse(content);
-
-    /* =========================
-       UPDATE ACTIVE PROJECT
-    ========================= */
-
-    activeProject = result;
-
-    res.json(result);
-
-  } catch (err) {
-
-    console.error(err);
-
-    res.status(500).json({
-      error: err.message
-    });
-
   }
-
-});
+);
 
 /* =========================
-   SAVE PROJECT MEMORY
+   GET ACTIVE PROJECT
 ========================= */
 
-app.post("/save-project-memory", (req, res) => {
+app.get(
+  "/get-project-memory",
+  (req,res) => {
 
-  try {
-
-    activeProject = req.body;
-
-    res.json({
-      success: true,
-      message: "Project memory saved"
-    });
-
-  } catch (err) {
-
-    res.status(500).json({
-      success: false
-    });
+    res.json(activeProject);
 
   }
-
-});
-
-/* =========================
-   GET PROJECT MEMORY
-========================= */
-
-app.get("/get-project-memory", (req, res) => {
-
-  res.json(activeProject);
-
-});
+);
 
 /* =========================
    DOWNLOAD ZIP
 ========================= */
 
-app.get("/download-project", (req, res) => {
+app.get(
+  "/download-project",
+  (req,res) => {
 
-  const zipPath =
-    path.join(__dirname, "project.zip");
+    const zipPath =
+      path.join(
+        __dirname,
+        "project.zip"
+      );
 
-  if (fs.existsSync(zipPath)) {
+    if(
+      !fs.existsSync(zipPath)
+    ){
+
+      return res.status(404).send(
+        "ZIP not found"
+      );
+
+    }
 
     res.download(zipPath);
 
-  } else {
-
-    res.status(404).send(
-      "ZIP file not found"
-    );
-
   }
+);
+
+/* =========================
+   ROOT
+========================= */
+
+app.get("/", (req,res) => {
+
+  res.sendFile(
+    path.join(
+      __dirname,
+      "public",
+      "index.html"
+    )
+  );
 
 });
 
@@ -508,7 +480,10 @@ app.get("/download-project", (req, res) => {
    START SERVER
 ========================= */
 
-app.listen(3000, () => {
+const PORT =
+  process.env.PORT || 3000;
+
+app.listen(PORT, () => {
 
   console.log(
     "🚀 AI Dev Mentor Pro Running"
