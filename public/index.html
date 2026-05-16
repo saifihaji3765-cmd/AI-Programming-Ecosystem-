@@ -216,6 +216,19 @@ pre{
   margin-bottom:8px;
 }
 
+.editor-area{
+  width:100%;
+  height:500px;
+  background:#020617;
+  color:#e2e8f0;
+  border:none;
+  outline:none;
+  padding:20px;
+  font-family:monospace;
+  font-size:14px;
+  resize:vertical;
+}
+
 @media(max-width:900px){
 
   .sidebar{
@@ -350,6 +363,21 @@ pre{
         🗑 Clear
       </button>
 
+      <a
+        href="/download-project"
+        target="_blank"
+        style="
+          background:#16a34a;
+          color:white;
+          text-decoration:none;
+          padding:12px 18px;
+          border-radius:10px;
+          font-weight:bold;
+        "
+      >
+        ⬇ Download ZIP
+      </a>
+
     </div>
 
   </div>
@@ -462,31 +490,68 @@ async function streamHTML(html){
   div.className =
     "message";
 
+  div.innerHTML =
+    html;
+
   chat.appendChild(div);
 
-  let i = 0;
+  chat.scrollTop =
+    chat.scrollHeight;
 
-  const speed = 3;
+}
 
-  function type(){
+/* =========================
+   SAVE FILE
+========================= */
 
-    if(i < html.length){
+async function saveEditedFile(
+  fileName,
+  editorId
+){
 
-      div.innerHTML =
-        html.slice(0, i);
+  const content =
+    document.getElementById(
+      editorId
+    ).value;
 
-      i += speed;
+  const res =
+    await fetch(
+      "/save-file",
+      {
 
-      chat.scrollTop =
-        chat.scrollHeight;
+        method:"POST",
 
-      requestAnimationFrame(type);
+        headers:{
+          "Content-Type":
+          "application/json"
+        },
 
-    }
+        body:JSON.stringify({
+
+          fileName,
+          content
+
+        })
+
+      }
+    );
+
+  const data =
+    await res.json();
+
+  if(data.success){
+
+    alert(
+      "✅ File Saved"
+    );
+
+  } else {
+
+    alert(
+      "❌ Save Failed"
+    );
 
   }
-
-  type();
 
 }
 
@@ -531,15 +596,15 @@ function renderFileExplorer(files){
 
     div.onclick = () => {
 
-      const fileId =
-        "file_" + Date.now();
+      const editorId =
+        "editor_" + Date.now();
 
-      streamHTML(`
+      const html = `
 
         <div class="section">
 
           <div class="section-title">
-            📄 ${file.name}
+            ✏ Editing: ${file.name}
           </div>
 
           <div class="code-box">
@@ -547,27 +612,33 @@ function renderFileExplorer(files){
             <div class="code-top">
 
               <div>
-                Source File
+                ${file.name}
               </div>
 
               <button
                 class="copy-btn"
-                onclick="copyCode('${fileId}')"
+                onclick="saveEditedFile(
+                  '${file.name}',
+                  '${editorId}'
+                )"
               >
-                Copy
+                💾 Save
               </button>
 
             </div>
 
-            <pre id="${fileId}">
-${file.content}
-            </pre>
+            <textarea
+              id="${editorId}"
+              class="editor-area"
+            >${file.content}</textarea>
 
           </div>
 
         </div>
 
-      `);
+      `;
+
+      streamHTML(html);
 
     };
 
@@ -799,6 +870,74 @@ ${data.fixedCode || ""}
     saveHistory(
       "💻 Analysis",
       html
+    );
+
+  }
+
+  /* =========================
+     PROJECT MODE
+  ========================= */
+
+  if(mode === "project"){
+
+    const res =
+      await fetch(
+        "/generate-project",
+        {
+
+          method:"POST",
+
+          headers:{
+            "Content-Type":
+            "application/json"
+          },
+
+          body:JSON.stringify({
+            prompt
+          })
+
+        }
+      );
+
+    const data =
+      await res.json();
+
+    document.getElementById(
+      "activeProjectName"
+    ).innerText =
+      data.projectName;
+
+    renderFileExplorer(
+      data.files
+    );
+
+    updateWorkflowSuggestions(
+      data.projectName
+    );
+
+    streamHTML(`
+
+      <div class="section">
+
+        <div class="section-title">
+          🚀 Project Generated
+        </div>
+
+        <pre>
+Project:
+${data.projectName}
+
+Files:
+${data.files.length}
+        </pre>
+
+      </div>
+
+    `);
+
+    saveHistory(
+      "🏗 " + data.projectName,
+      data.projectName
     );
 
   }
