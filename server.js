@@ -430,7 +430,68 @@ app.get(
 
   }
 );
+/* =========================
+   SAVE SINGLE FILE
+========================= */
 
+app.post(
+  "/save-file",
+  (req,res) => {
+
+    try {
+
+      const {
+        fileName,
+        content
+      } = req.body;
+
+      /* =========================
+         UPDATE MEMORY
+      ========================= */
+
+      const file =
+        activeProject.files.find(
+          f => f.name === fileName
+        );
+
+      if(file){
+
+        file.content = content;
+
+      }
+
+      /* =========================
+         UPDATE DISK FILE
+      ========================= */
+
+      const filePath =
+        path.join(
+          __dirname,
+          "generated_project",
+          fileName
+        );
+
+      fs.writeFileSync(
+        filePath,
+        content
+      );
+
+      res.json({
+        success:true
+      });
+
+    } catch(err){
+
+      console.log(err);
+
+      res.status(500).json({
+        success:false
+      });
+
+    }
+
+  }
+);
 /* =========================
    DOWNLOAD ZIP
 ========================= */
