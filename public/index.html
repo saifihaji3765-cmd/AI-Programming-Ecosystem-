@@ -365,6 +365,9 @@ pre{
 <button onclick="openTerminal()">
   🖥 Terminal
 </button>
+     <button onclick="openPreview()">
+  🌐 Live Preview
+</button>
       <a
         href="/download-project"
         target="_blank"
@@ -502,6 +505,73 @@ async function streamHTML(html){
 
 }
 /* =========================
+   LIVE PREVIEW
+========================= */
+
+function openPreview(){
+
+  const html = `
+
+    <div class="section">
+
+      <div class="section-title">
+        🌐 Live Preview
+      </div>
+
+      <div class="code-box">
+
+        <div class="code-top">
+
+          <div>
+            http://localhost:3000
+          </div>
+
+          <button
+            class="copy-btn"
+            onclick="refreshPreview()"
+          >
+            🔄 Refresh
+          </button>
+
+        </div>
+
+        <iframe
+          id="previewFrame"
+          src="/"
+          style="
+            width:100%;
+            height:700px;
+            border:none;
+            background:white;
+          "
+        ></iframe>
+
+      </div>
+
+    </div>
+
+  `;
+
+  streamHTML(html);
+
+}
+
+/* =========================
+   REFRESH PREVIEW
+========================= */
+
+function refreshPreview(){
+
+  const frame =
+    document.getElementById(
+      "previewFrame"
+    );
+
+  frame.src =
+    frame.src;
+
+}
+  /* =========================
    OPEN TERMINAL
 ========================= */
 
