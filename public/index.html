@@ -25,7 +25,7 @@ body{
 }
 
 .sidebar{
-  width:260px;
+  width:280px;
   background:#111827;
   border-right:1px solid #1f2937;
   display:flex;
@@ -48,6 +48,7 @@ body{
 .history-title{
   color:#60a5fa;
   margin-bottom:16px;
+  margin-top:18px;
   font-size:18px;
 }
 
@@ -61,6 +62,21 @@ body{
 
 .history-item:hover{
   background:#374151;
+}
+
+.file-item{
+  background:#0f172a;
+  border:1px solid #334155;
+  padding:12px;
+  border-radius:10px;
+  margin-bottom:10px;
+  cursor:pointer;
+  font-size:14px;
+  color:#cbd5e1;
+}
+
+.file-item:hover{
+  background:#1e293b;
 }
 
 .main{
@@ -187,17 +203,6 @@ pre{
   color:#e2e8f0;
 }
 
-.download-btn{
-  display:inline-block;
-  background:#16a34a;
-  color:white;
-  text-decoration:none;
-  padding:14px 18px;
-  border-radius:10px;
-  margin-top:20px;
-  font-weight:bold;
-}
-
 .active-project{
   background:#0f172a;
   border:1px solid #334155;
@@ -249,11 +254,35 @@ pre{
 
     </div>
 
+    <div
+      id="workflowPanel"
+      class="active-project"
+      style="margin-top:15px;"
+    >
+
+      <div class="active-project-title">
+        🧠 Suggested Steps
+      </div>
+
+      <div id="workflowSteps">
+
+        No suggestions yet
+
+      </div>
+
+    </div>
+
     <div class="history-title">
       📂 History
     </div>
 
     <div id="historyList"></div>
+
+    <div class="history-title">
+      📁 Project Files
+    </div>
+
+    <div id="fileExplorer"></div>
 
   </div>
 
@@ -333,6 +362,10 @@ let historyData = JSON.parse(
   localStorage.getItem("ai_history")
 ) || [];
 
+/* =========================
+   HISTORY
+========================= */
+
 function saveHistory(title,content){
 
   historyData.unshift({
@@ -352,7 +385,11 @@ function saveHistory(title,content){
 function renderHistory(){
 
   const list =
-    document.getElementById("historyList");
+    document.getElementById(
+      "historyList"
+    );
+
+  if(!list) return;
 
   list.innerHTML = "";
 
@@ -361,9 +398,11 @@ function renderHistory(){
     const div =
       document.createElement("div");
 
-    div.className = "history-item";
+    div.className =
+      "history-item";
 
-    div.innerText = item.title;
+    div.innerText =
+      item.title;
 
     div.onclick = () => {
 
@@ -389,45 +428,39 @@ function clearHistory(){
 
 }
 
+/* =========================
+   COPY CODE
+========================= */
+
 function copyCode(id){
 
   const text =
-    document.getElementById(id).innerText;
+    document.getElementById(id)
+    .innerText;
 
-  navigator.clipboard.writeText(text);
+  navigator.clipboard
+    .writeText(text);
 
   alert("Copied");
 
 }
 
-function addHTML(html){
-
-  const chat =
-    document.getElementById("chat");
-
-  const div =
-    document.createElement("div");
-
-  div.className = "message";
-
-  div.innerHTML = html;
-
-  chat.appendChild(div);
-
-  chat.scrollTop =
-    chat.scrollHeight;
-
-}
+/* =========================
+   STREAM RESPONSE
+========================= */
 
 async function streamHTML(html){
 
   const chat =
-    document.getElementById("chat");
+    document.getElementById(
+      "chat"
+    );
 
   const div =
     document.createElement("div");
 
-  div.className = "message";
+  div.className =
+    "message";
 
   chat.appendChild(div);
 
@@ -457,6 +490,141 @@ async function streamHTML(html){
 
 }
 
+/* =========================
+   FILE EXPLORER
+========================= */
+
+function renderFileExplorer(files){
+
+  const explorer =
+    document.getElementById(
+      "fileExplorer"
+    );
+
+  explorer.innerHTML = "";
+
+  if(
+    !files ||
+    files.length === 0
+  ){
+
+    explorer.innerHTML = `
+      <div class="file-item">
+        No files yet
+      </div>
+    `;
+
+    return;
+
+  }
+
+  files.forEach(file => {
+
+    const div =
+      document.createElement("div");
+
+    div.className =
+      "file-item";
+
+    div.innerText =
+      "📄 " + file.name;
+
+    div.onclick = () => {
+
+      const fileId =
+        "file_" + Date.now();
+
+      streamHTML(`
+
+        <div class="section">
+
+          <div class="section-title">
+            📄 ${file.name}
+          </div>
+
+          <div class="code-box">
+
+            <div class="code-top">
+
+              <div>
+                Source File
+              </div>
+
+              <button
+                class="copy-btn"
+                onclick="copyCode('${fileId}')"
+              >
+                Copy
+              </button>
+
+            </div>
+
+            <pre id="${fileId}">
+${file.content}
+            </pre>
+
+          </div>
+
+        </div>
+
+      `);
+
+    };
+
+    explorer.appendChild(div);
+
+  });
+
+}
+
+/* =========================
+   WORKFLOW
+========================= */
+
+function updateWorkflowSuggestions(
+  projectName
+){
+
+  const steps =
+    document.getElementById(
+      "workflowSteps"
+    );
+
+  if(!projectName){
+
+    steps.innerHTML =
+      "No suggestions yet";
+
+    return;
+
+  }
+
+  steps.innerHTML = `
+
+    <div class="file-item">
+      ✔ Add authentication
+    </div>
+
+    <div class="file-item">
+      ✔ Create database
+    </div>
+
+    <div class="file-item">
+      ✔ Improve UI
+    </div>
+
+    <div class="file-item">
+      ✔ Deploy backend
+    </div>
+
+  `;
+
+}
+
+/* =========================
+   LOAD ACTIVE PROJECT
+========================= */
+
 async function loadActiveProject(){
 
   try {
@@ -479,6 +647,14 @@ async function loadActiveProject(){
       ).innerText =
         data.projectName;
 
+      renderFileExplorer(
+        data.files
+      );
+
+      updateWorkflowSuggestions(
+        data.projectName
+      );
+
     }
 
   } catch(err){
@@ -488,6 +664,10 @@ async function loadActiveProject(){
   }
 
 }
+
+/* =========================
+   RUN AI
+========================= */
 
 async function runAI(){
 
@@ -506,11 +686,17 @@ async function runAI(){
       "language"
     ).value;
 
-  addHTML(`
+  streamHTML(`
+
     <div class="section-title">
       🧠 AI Thinking...
     </div>
+
   `);
+
+  /* =========================
+     ANALYZE MODE
+  ========================= */
 
   if(mode === "analyze"){
 
@@ -619,7 +805,12 @@ ${data.fixedCode || ""}
 
 }
 
+/* =========================
+   INIT
+========================= */
+
 renderHistory();
+
 loadActiveProject();
 
 </script>
