@@ -24,10 +24,6 @@ body{
   display:flex;
 }
 
-/* =========================
-   SIDEBAR
-========================= */
-
 .sidebar{
   width:260px;
   background:#111827;
@@ -67,10 +63,6 @@ body{
   background:#374151;
 }
 
-/* =========================
-   MAIN
-========================= */
-
 .main{
   flex:1;
   display:flex;
@@ -97,10 +89,6 @@ body{
   color:#94a3b8;
   font-size:18px;
 }
-
-/* =========================
-   INPUT AREA
-========================= */
 
 .input-area{
   background:#111827;
@@ -149,10 +137,6 @@ select{
   padding:12px;
   border-radius:10px;
 }
-
-/* =========================
-   OUTPUT
-========================= */
 
 .message{
   background:#111827;
@@ -214,10 +198,6 @@ pre{
   font-weight:bold;
 }
 
-/* =========================
-   ACTIVE PROJECT
-========================= */
-
 .active-project{
   background:#0f172a;
   border:1px solid #334155;
@@ -230,10 +210,6 @@ pre{
   color:#22c55e;
   margin-bottom:8px;
 }
-
-/* =========================
-   MOBILE
-========================= */
 
 @media(max-width:900px){
 
@@ -252,10 +228,6 @@ pre{
 </head>
 
 <body>
-
-<!-- =========================
-     SIDEBAR
-========================= -->
 
 <div class="sidebar">
 
@@ -287,10 +259,6 @@ pre{
 
 </div>
 
-<!-- =========================
-     MAIN
-========================= -->
-
 <div class="main">
 
   <div class="chat" id="chat">
@@ -306,10 +274,6 @@ pre{
     </div>
 
   </div>
-
-  <!-- =========================
-       INPUT AREA
-  ========================= -->
 
   <div class="input-area">
 
@@ -365,17 +329,9 @@ pre{
 
 <script>
 
-/* =========================
-   HISTORY
-========================= */
-
 let historyData = JSON.parse(
   localStorage.getItem("ai_history")
 ) || [];
-
-/* =========================
-   SAVE HISTORY
-========================= */
 
 function saveHistory(title,content){
 
@@ -392,10 +348,6 @@ function saveHistory(title,content){
   renderHistory();
 
 }
-
-/* =========================
-   RENDER HISTORY
-========================= */
 
 function renderHistory(){
 
@@ -415,7 +367,7 @@ function renderHistory(){
 
     div.onclick = () => {
 
-      addHTML(item.content);
+      streamHTML(item.content);
 
     };
 
@@ -424,10 +376,6 @@ function renderHistory(){
   });
 
 }
-
-/* =========================
-   CLEAR HISTORY
-========================= */
 
 function clearHistory(){
 
@@ -441,10 +389,6 @@ function clearHistory(){
 
 }
 
-/* =========================
-   COPY CODE
-========================= */
-
 function copyCode(id){
 
   const text =
@@ -455,10 +399,6 @@ function copyCode(id){
   alert("Copied");
 
 }
-
-/* =========================
-   ADD HTML
-========================= */
 
 function addHTML(html){
 
@@ -479,9 +419,43 @@ function addHTML(html){
 
 }
 
-/* =========================
-   LOAD ACTIVE PROJECT
-========================= */
+async function streamHTML(html){
+
+  const chat =
+    document.getElementById("chat");
+
+  const div =
+    document.createElement("div");
+
+  div.className = "message";
+
+  chat.appendChild(div);
+
+  let i = 0;
+
+  const speed = 3;
+
+  function type(){
+
+    if(i < html.length){
+
+      div.innerHTML =
+        html.slice(0, i);
+
+      i += speed;
+
+      chat.scrollTop =
+        chat.scrollHeight;
+
+      requestAnimationFrame(type);
+
+    }
+
+  }
+
+  type();
+
+}
 
 async function loadActiveProject(){
 
@@ -515,10 +489,6 @@ async function loadActiveProject(){
 
 }
 
-/* =========================
-   RUN AI
-========================= */
-
 async function runAI(){
 
   const prompt =
@@ -541,10 +511,6 @@ async function runAI(){
       🧠 AI Thinking...
     </div>
   `);
-
-  /* =========================
-     ANALYZE CODE
-  ========================= */
 
   if(mode === "analyze"){
 
@@ -642,7 +608,7 @@ ${data.fixedCode || ""}
 
     `;
 
-    addHTML(html);
+    streamHTML(html);
 
     saveHistory(
       "💻 Analysis",
@@ -651,338 +617,12 @@ ${data.fixedCode || ""}
 
   }
 
-  /* =========================
-     ENGINEERING REVIEW
-  ========================= */
-
-  if(mode === "review"){
-
-    const res =
-      await fetch(
-        "/engineering-review",
-        {
-
-          method:"POST",
-
-          headers:{
-            "Content-Type":
-            "application/json"
-          },
-
-          body:JSON.stringify({
-            code:prompt,
-            language
-          })
-
-        }
-      );
-
-    const data =
-      await res.json();
-
-    const html = `
-
-      <div class="section">
-
-        <div class="section-title">
-          🔒 Security
-        </div>
-
-        <pre>
-${(data.securityIssues || []).join("\n\n")}
-        </pre>
-
-      </div>
-
-      <div class="section">
-
-        <div class="section-title">
-          ⚡ Performance
-        </div>
-
-        <pre>
-${(data.performanceIssues || []).join("\n\n")}
-        </pre>
-
-      </div>
-
-      <div class="section">
-
-        <div class="section-title">
-          📈 Scalability
-        </div>
-
-        <pre>
-${(data.scalabilityIssues || []).join("\n\n")}
-        </pre>
-
-      </div>
-
-      <div class="section">
-
-        <div class="section-title">
-          🏗 Architecture
-        </div>
-
-        <pre>
-${(data.architectureReview || []).join("\n\n")}
-        </pre>
-
-      </div>
-
-      <div class="section">
-
-        <div class="section-title">
-          ✅ Best Practices
-        </div>
-
-        <pre>
-${(data.bestPractices || []).join("\n\n")}
-        </pre>
-
-      </div>
-
-    `;
-
-    addHTML(html);
-
-    saveHistory(
-      "🧠 Engineering Review",
-      html
-    );
-
-  }
-
-  /* =========================
-     GENERATE PROJECT
-  ========================= */
-
-  if(mode === "project"){
-
-    const res =
-      await fetch(
-        "/generate-project",
-        {
-
-          method:"POST",
-
-          headers:{
-            "Content-Type":
-            "application/json"
-          },
-
-          body:JSON.stringify({
-            idea:prompt
-          })
-
-        }
-      );
-
-    const data =
-      await res.json();
-
-    document.getElementById(
-      "activeProjectName"
-    ).innerText =
-      data.projectName;
-
-    let filesHTML = "";
-
-    (data.files || []).forEach(
-      (file,index) => {
-
-      const fileId =
-        "file_" +
-        index +
-        "_" +
-        Date.now();
-
-      filesHTML += `
-
-        <div class="section">
-
-          <div class="section-title">
-            📄 ${file.name}
-          </div>
-
-          <div class="code-box">
-
-            <div class="code-top">
-
-              <div>
-                File
-              </div>
-
-              <button
-                class="copy-btn"
-                onclick="copyCode('${fileId}')"
-              >
-                Copy
-              </button>
-
-            </div>
-
-            <pre id="${fileId}">
-${file.content}
-            </pre>
-
-          </div>
-
-        </div>
-
-      `;
-
-    });
-
-    const html = `
-
-      <div class="section">
-
-        <div class="section-title">
-          📦 Project
-        </div>
-
-        <pre>
-${data.projectName}
-        </pre>
-
-      </div>
-
-      ${filesHTML}
-
-      <a
-        href="/download-project"
-        class="download-btn"
-      >
-        ⬇ Download ZIP
-      </a>
-
-    `;
-
-    addHTML(html);
-
-    saveHistory(
-      data.projectName,
-      html
-    );
-
-  }
-
-  /* =========================
-     EDIT PROJECT
-  ========================= */
-
-  if(mode === "edit"){
-
-    const res =
-      await fetch(
-        "/edit-project",
-        {
-
-          method:"POST",
-
-          headers:{
-            "Content-Type":
-            "application/json"
-          },
-
-          body:JSON.stringify({
-            instruction:prompt
-          })
-
-        }
-      );
-
-    const data =
-      await res.json();
-
-    let filesHTML = "";
-
-    (data.files || []).forEach(
-      (file,index) => {
-
-      const fileId =
-        "edit_" +
-        index +
-        "_" +
-        Date.now();
-
-      filesHTML += `
-
-        <div class="section">
-
-          <div class="section-title">
-            ✏ ${file.name}
-          </div>
-
-          <div class="code-box">
-
-            <div class="code-top">
-
-              <div>
-                Updated File
-              </div>
-
-              <button
-                class="copy-btn"
-                onclick="copyCode('${fileId}')"
-              >
-                Copy
-              </button>
-
-            </div>
-
-            <pre id="${fileId}">
-${file.content}
-            </pre>
-
-          </div>
-
-        </div>
-
-      `;
-
-    });
-
-    const html = `
-
-      <div class="section">
-
-        <div class="section-title">
-          🧠 Project Updated
-        </div>
-
-        <pre>
-${data.summary || ""}
-        </pre>
-
-      </div>
-
-      ${filesHTML}
-
-    `;
-
-    addHTML(html);
-
-    saveHistory(
-      "✏ Edited Project",
-      html
-    );
-
-  }
-
 }
 
-/* =========================
-   INIT
-========================= */
-
 renderHistory();
-
 loadActiveProject();
 
 </script>
 
 </body>
-
 </html>
