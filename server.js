@@ -1,6 +1,8 @@
 /* =========================
    IMPORTS
 ========================= */
+const multer =
+  require("multer");
 
 require("dotenv").config();
 
@@ -89,6 +91,47 @@ if(
   );
 
 }
+/* =========================
+   MULTER STORAGE
+========================= */
+
+const storage =
+  multer.diskStorage({
+
+    destination:
+      function(
+        req,
+        file,
+        cb
+      ){
+
+        cb(
+          null,
+          WORKSPACE
+        );
+
+      },
+
+    filename:
+      function(
+        req,
+        file,
+        cb
+      ){
+
+        cb(
+          null,
+          file.originalname
+        );
+
+      }
+
+  });
+
+const upload =
+  multer({
+    storage
+  });
 
 /* =========================
    ACTIVE PROJECT
@@ -1176,6 +1219,44 @@ ${file.name}
 
         success:false,
         error:err.message
+
+      });
+
+    }
+
+  }
+
+);
+/* =========================
+   FILE UPLOAD
+========================= */
+
+app.post(
+
+  "/upload",
+
+  upload.single(
+    "file"
+  ),
+
+  (req,res) => {
+
+    try {
+
+      loadWorkspaceFiles();
+
+      res.json({
+
+        success:true,
+        file:req.file
+
+      });
+
+    } catch(err){
+
+      res.status(500).json({
+
+        success:false
 
       });
 
