@@ -1,16 +1,51 @@
-const express = require("express");
-const dotenv = require("dotenv");
-const cors = require("cors");
-const fs = require("fs");
+/* =========================
+   IMPORTS
+========================= */
+
+require("dotenv").config();
+
+const express =
+  require("express");
+
+const cors =
+  require("cors");
+
+const fs =
+  require("fs");
+
+const path =
+  require("path");
+
+const bodyParser =
+  require("body-parser");
+
 const { exec } =
   require("child_process");
-const path = require("path");
-const archiver = require("archiver");
-const { OpenAI } = require("openai");
 
-dotenv.config();
+const OpenAI =
+  require("openai");
 
-const app = express();
+/* =========================
+   OPENAI
+========================= */
+
+const openai =
+  new OpenAI({
+
+    apiKey:
+      process.env.OPENAI_API_KEY
+
+  });
+
+/* =========================
+   APP
+========================= */
+
+const app =
+  express();
+
+const PORT =
+  3000;
 
 /* =========================
    MIDDLEWARE
@@ -18,178 +53,511 @@ const app = express();
 
 app.use(cors());
 
-app.use(express.json({
-  limit:"50mb"
-}));
+app.use(
+  bodyParser.json({
+    limit:"50mb"
+  })
+);
 
-app.use(express.static("public"));
+app.use(
+  express.static(
+    path.join(
+      __dirname,
+      "public"
+    )
+  )
+);
 
 /* =========================
-   OPENAI
+   WORKSPACE
 ========================= */
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY
-});
+const WORKSPACE =
+  path.join(
+    __dirname,
+    "workspace"
+  );
+
+if(
+  !fs.existsSync(
+    WORKSPACE
+  )
+){
+
+  fs.mkdirSync(
+    WORKSPACE
+  );
+
+}
 
 /* =========================
-   ACTIVE PROJECT MEMORY
+   ACTIVE PROJECT
 ========================= */
 
 let activeProject = {
-  projectName:"",
+
+  projectName:
+    "AI Workspace",
+
   files:[]
+
 };
 
 /* =========================
-   SAFE JSON PARSER
+   LOAD FILES
 ========================= */
 
-function safeJSONParse(text){
+function loadWorkspaceFiles(){
 
-  try {
-
-    return JSON.parse(text);
-
-  } catch(err){
-
-    const match =
-      text.match(/\{[\s\S]*\}/);
-
-    if(match){
-
-      return JSON.parse(match[0]);
-
-    }
-
-    throw new Error(
-      "Invalid AI JSON response"
+  const files =
+    fs.readdirSync(
+      WORKSPACE
     );
 
-  }
+  activeProject.files =
+    files.map(file => {
 
-}
-
-/* =========================
-   SAVE PROJECT FILES
-========================= */
-
-function saveProjectFiles(
-  projectName,
-  files
-){
-
-  const projectDir =
-    path.join(
-      __dirname,
-      "generated_project"
-    );
-
-  if(
-    fs.existsSync(projectDir)
-  ){
-
-    fs.rmSync(
-      projectDir,
-      {
-        recursive:true,
-        force:true
-      }
-    );
-
-  }
-
-  fs.mkdirSync(
-    projectDir,
-    {
-      recursive:true
-    }
-  );
-
-  files.forEach(file => {
-
-    const filePath =
-      path.join(
-        projectDir,
-        file.name
-      );
-
-    const dir =
-      path.dirname(filePath);
-
-    fs.mkdirSync(
-      dir,
-      {
-        recursive:true
-      }
-    );
-
-    fs.writeFileSync(
-      filePath,
-      file.content || ""
-    );
-
-  });
-
-}
-
-/* =========================
-   CREATE ZIP
-========================= */
-
-function createZip(){
-
-  return new Promise(
-    (resolve,reject) => {
-
-      const output =
-        fs.createWriteStream(
-          path.join(
-            __dirname,
-            "project.zip"
-          )
+      const filePath =
+        path.join(
+          WORKSPACE,
+          file
         );
 
-      const archive =
-        archiver("zip", {
-          zlib:{
-            level:9
-          }
-        });
+      const stat =
+        fs.statSync(
+          filePath
+        );
 
-      output.on(
-        "close",
-        () => resolve()
-      );
+      /* =========================
+         FOLDER
+      ========================= */
 
-      archive.on(
-        "error",
-        err => reject(err)
-      );
+      if(stat.isDirectory()){
 
-      archive.pipe(output);
+        return {
 
-      archive.directory(
-        path.join(
-          __dirname,
-          "generated_project"
-        ),
-        false
-      );
+          name:file,
+          type:"folder",
+          content:""
 
-      archive.finalize();
+        };
 
-    }
-  );
+      }
+
+      /* =========================
+         FILE
+      ========================= */
+
+      return {
+
+        name:file,
+        type:"file",
+
+        content:
+          fs.readFileSync(
+            filePath,
+            "utf-8"
+          )
+
+      };
+
+    });
 
 }
 
+loadWorkspaceFiles();
+
 /* =========================
-   ANALYZE CODE
+   GET PROJECT MEMORY
+========================= */
+
+app.get(
+
+  "/get-project-memory",
+
+  (req,res) => {
+
+    loadWorkspaceFiles();
+
+    res.json(
+      activeProject
+    );
+
+  }
+
+);
+
+/* =========================
+   SAVE FILE
 ========================= */
 
 app.post(
+
+  "/save-file",
+
+  (req,res) => {
+
+    try {
+
+      const {
+        fileName,
+        content
+      } = req.body;
+
+      const filePath =
+        path.join(
+          WORKSPACE,
+          fileName
+        );
+
+      fs.writeFileSync(
+        filePath,
+        content
+      );
+
+      loadWorkspaceFiles();
+
+      res.json({
+
+        success:true
+
+      });
+
+    } catch(err){
+
+      res.status(500).json({
+
+        success:false,
+        error:err.message
+
+      });
+
+    }
+
+  }
+
+);
+
+/* =========================
+   CREATE FILE
+========================= */
+
+app.post(
+
+  "/create-file",
+
+  (req,res) => {
+
+    try {
+
+      const {
+        name
+      } = req.body;
+
+      const filePath =
+        path.join(
+          WORKSPACE,
+          name
+        );
+
+      fs.writeFileSync(
+        filePath,
+        ""
+      );
+
+      loadWorkspaceFiles();
+
+      res.json({
+
+        success:true
+
+      });
+
+    } catch(err){
+
+      res.status(500).json({
+
+        success:false
+
+      });
+
+    }
+
+  }
+
+);
+
+/* =========================
+   CREATE FOLDER
+========================= */
+
+app.post(
+
+  "/create-folder",
+
+  (req,res) => {
+
+    try {
+
+      const {
+        name
+      } = req.body;
+
+      const folderPath =
+        path.join(
+          WORKSPACE,
+          name
+        );
+
+      if(
+        !fs.existsSync(
+          folderPath
+        )
+      ){
+
+        fs.mkdirSync(
+          folderPath
+        );
+
+      }
+
+      loadWorkspaceFiles();
+
+      res.json({
+
+        success:true
+
+      });
+
+    } catch(err){
+
+      res.status(500).json({
+
+        success:false
+
+      });
+
+    }
+
+  }
+
+);
+
+/* =========================
+   DELETE FILE
+========================= */
+
+app.post(
+
+  "/delete-file",
+
+  (req,res) => {
+
+    try {
+
+      const {
+        name
+      } = req.body;
+
+      const filePath =
+        path.join(
+          WORKSPACE,
+          name
+        );
+
+      if(
+        fs.existsSync(
+          filePath
+        )
+      ){
+
+        const stat =
+          fs.statSync(
+            filePath
+          );
+
+        if(
+          stat.isDirectory()
+        ){
+
+          fs.rmSync(
+            filePath,
+            {
+              recursive:true,
+              force:true
+            }
+          );
+
+        } else {
+
+          fs.unlinkSync(
+            filePath
+          );
+
+        }
+
+      }
+
+      loadWorkspaceFiles();
+
+      res.json({
+
+        success:true
+
+      });
+
+    } catch(err){
+
+      res.status(500).json({
+
+        success:false
+
+      });
+
+    }
+
+  }
+
+);
+
+/* =========================
+   RENAME FILE
+========================= */
+
+app.post(
+
+  "/rename-file",
+
+  (req,res) => {
+
+    try {
+
+      const {
+        oldName,
+        newName
+      } = req.body;
+
+      const oldPath =
+        path.join(
+          WORKSPACE,
+          oldName
+        );
+
+      const newPath =
+        path.join(
+          WORKSPACE,
+          newName
+        );
+
+      fs.renameSync(
+        oldPath,
+        newPath
+      );
+
+      loadWorkspaceFiles();
+
+      res.json({
+
+        success:true
+
+      });
+
+    } catch(err){
+
+      res.status(500).json({
+
+        success:false
+
+      });
+
+    }
+
+  }
+
+);
+
+/* =========================
+   TERMINAL
+========================= */
+
+let terminalLogs = "";
+
+app.post(
+
+  "/terminal",
+
+  (req,res) => {
+
+    const {
+      command
+    } = req.body;
+
+    exec(
+
+      command,
+
+      {
+        cwd:WORKSPACE
+      },
+
+      (
+        error,
+        stdout,
+        stderr
+      ) => {
+
+        const output =
+          stdout || stderr;
+
+        terminalLogs += `
+${output}
+`;
+
+        res.json({
+
+          output
+
+        });
+
+      }
+
+    );
+
+  }
+
+);
+
+/* =========================
+   TERMINAL STREAM
+========================= */
+
+app.get(
+
+  "/terminal-stream",
+
+  (req,res) => {
+
+    res.json({
+
+      output:
+        terminalLogs
+
+    });
+
+    terminalLogs = "";
+
+  }
+
+);
+
+/* =========================
+   OPENAI ANALYZE
+========================= */
+
+app.post(
+
   "/analyze",
+
   async (req,res) => {
 
     try {
@@ -199,13 +567,27 @@ app.post(
         language
       } = req.body;
 
-      const prompt = `
+      const completion =
+        await openai.chat.completions.create({
+
+          model:
+            "gpt-4.1-mini",
+
+          messages:[
+
+            {
+
+              role:"system",
+
+              content:`
 
 You are an elite senior software engineer.
 
-Analyze the following code.
+Analyze code professionally.
 
-Return ONLY valid JSON:
+Return ONLY valid JSON.
+
+Required JSON format:
 
 {
   "issues": [],
@@ -214,40 +596,50 @@ Return ONLY valid JSON:
   "fixedCode": ""
 }
 
+              `
+
+            },
+
+            {
+
+              role:"user",
+
+              content:`
+
 Language:
 ${language}
 
 Code:
 ${code}
 
-`;
+              `
 
-      const response =
-        await openai.chat.completions.create({
-
-          model:"gpt-4.1-mini",
-
-          messages:[
-            {
-              role:"user",
-              content:prompt
             }
+
           ],
 
-          temperature:0.2
+          temperature:0.3
 
         });
 
-      const content =
-        response
+      const text =
+        completion
         .choices[0]
         .message
         .content;
 
-      const result =
-        safeJSONParse(content);
+      const cleaned =
+        text
+        .replace(/```json/g,"")
+        .replace(/```/g,"")
+        .trim();
 
-      res.json(result);
+      const parsed =
+        JSON.parse(
+          cleaned
+        );
+
+      res.json(parsed);
 
     } catch(err){
 
@@ -256,11 +648,11 @@ ${code}
       res.status(500).json({
 
         issues:[
-          "Server error"
+          "AI analysis failed"
         ],
 
         fixes:[
-          "Check API key or logs"
+          "Check API key"
         ],
 
         explanation:[
@@ -274,365 +666,52 @@ ${code}
     }
 
   }
-);
 
-/* =========================
-   GENERATE PROJECT
-========================= */
-
-app.post(
-  "/generate-project",
-  async (req,res) => {
-
-    try {
-
-      const {
-        prompt
-      } = req.body;
-
-      const aiPrompt = `
-
-You are an elite full stack AI engineer.
-
-Generate a COMPLETE production-ready project.
-
-Return ONLY valid JSON.
-
-FORMAT:
-
-{
-  "projectName":"",
-  "files":[
-    {
-      "name":"",
-      "content":""
-    }
-  ]
-}
-
-IMPORTANT:
-
-- Generate REAL code
-- Generate MULTIPLE files
-- Include package.json
-- Include frontend
-- Include backend
-- Include styling
-- Use clean architecture
-- No markdown
-- No explanations
-- JSON ONLY
-
-PROJECT REQUEST:
-${prompt}
-
-`;
-
-      const response =
-        await openai.chat.completions.create({
-
-          model:"gpt-4.1-mini",
-
-          messages:[
-            {
-              role:"user",
-              content:aiPrompt
-            }
-          ],
-
-          temperature:0.4
-
-        });
-
-      const content =
-        response
-        .choices[0]
-        .message
-        .content;
-
-      const result =
-        safeJSONParse(content);
-
-      /* =========================
-         SAVE ACTIVE PROJECT
-      ========================= */
-
-      activeProject = result;
-
-      /* =========================
-         SAVE FILES
-      ========================= */
-
-      saveProjectFiles(
-        result.projectName,
-        result.files
-      );
-
-      /* =========================
-         CREATE ZIP
-      ========================= */
-
-      await createZip();
-
-      res.json(result);
-
-    } catch(err){
-
-      console.log(err);
-
-      res.status(500).json({
-
-        success:false,
-        error:err.message
-
-      });
-
-    }
-
-  }
-);
-
-/* =========================
-   SAVE ACTIVE PROJECT
-========================= */
-
-app.post(
-  "/save-project-memory",
-  (req,res) => {
-
-    try {
-
-      activeProject =
-        req.body;
-
-      res.json({
-        success:true
-      });
-
-    } catch(err){
-
-      res.status(500).json({
-        success:false
-      });
-
-    }
-
-  }
-);
-
-/* =========================
-   GET ACTIVE PROJECT
-========================= */
-
-app.get(
-  "/get-project-memory",
-  (req,res) => {
-
-    res.json(activeProject);
-
-  }
-);
-/* =========================
-   SAVE SINGLE FILE
-========================= */
-
-app.post(
-  "/save-file",
-  (req,res) => {
-
-    try {
-
-      const {
-        fileName,
-        content
-      } = req.body;
-
-      /* =========================
-         UPDATE MEMORY
-      ========================= */
-
-      const file =
-        activeProject.files.find(
-          f => f.name === fileName
-        );
-
-      if(file){
-
-        file.content = content;
-
-      }
-
-      /* =========================
-         UPDATE DISK FILE
-      ========================= */
-
-      const filePath =
-        path.join(
-          __dirname,
-          "generated_project",
-          fileName
-        );
-
-      fs.writeFileSync(
-        filePath,
-        content
-      );
-
-      res.json({
-        success:true
-      });
-
-    } catch(err){
-
-      console.log(err);
-
-      res.status(500).json({
-        success:false
-      });
-
-    }
-
-  }
-);
-/* =========================
-   TERMINAL COMMAND
-========================= */
-
-app.post(
-  "/terminal",
-  (req,res) => {
-
-    try {
-
-      const {
-        command
-      } = req.body;
-
-      if(!command){
-
-        return res.status(400).json({
-          success:false
-        });
-
-      }
-
-      exec(
-
-        command,
-
-        {
-          cwd:path.join(
-            __dirname,
-            "generated_project"
-          )
-        },
-
-        (
-          error,
-          stdout,
-          stderr
-        ) => {
-
-          if(error){
-
-            return res.json({
-
-              success:false,
-
-              output:
-                stderr ||
-                error.message
-
-            });
-
-          }
-
-          res.json({
-
-            success:true,
-
-            output:
-              stdout ||
-              "Command executed"
-
-          });
-
-        }
-
-      );
-
-    } catch(err){
-
-      console.log(err);
-
-      res.status(500).json({
-
-        success:false,
-
-        output:err.message
-
-      });
-
-    }
-
-  }
-);
-/* =========================
-   DOWNLOAD ZIP
-========================= */
-
-app.get(
-  "/download-project",
-  (req,res) => {
-
-    const zipPath =
-      path.join(
-        __dirname,
-        "project.zip"
-      );
-
-    if(
-      !fs.existsSync(zipPath)
-    ){
-
-      return res.status(404).send(
-        "ZIP not found"
-      );
-
-    }
-
-    res.download(zipPath);
-
-  }
 );
 
 /* =========================
    ROOT
 ========================= */
 
-app.get("/", (req,res) => {
+app.get(
 
-  res.sendFile(
-    path.join(
-      __dirname,
-      "public",
-      "index.html"
-    )
-  );
+  "/",
 
-});
+  (req,res) => {
+
+    res.sendFile(
+
+      path.join(
+
+        __dirname,
+        "public",
+        "index.html"
+
+      )
+
+    );
+
+  }
+
+);
 
 /* =========================
    START SERVER
 ========================= */
 
-const PORT =
-  process.env.PORT || 3000;
+app.listen(
 
-app.listen(PORT, () => {
+  PORT,
 
-  console.log(
-    "🚀 AI Dev Mentor Pro Running"
-  );
+  () => {
 
-});
+    console.log(`
+
+🚀 AI Dev Mentor Running
+http://localhost:${PORT}
+
+    `);
+
+  }
+
+);
