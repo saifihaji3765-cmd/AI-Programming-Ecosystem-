@@ -1,6 +1,8 @@
 /* =========================
    IMPORTS
 ========================= */
+const { spawn } =
+  require("child_process");
 const multer =
   require("multer");
 
@@ -1257,6 +1259,112 @@ app.post(
       res.status(500).json({
 
         success:false
+
+      });
+
+    }
+
+  }
+
+);
+/* =========================
+   LIVE PREVIEW
+========================= */
+
+let previewProcess = null;
+
+app.post(
+
+  "/start-preview",
+
+  async (req,res) => {
+
+    try {
+
+      /* =========================
+         STOP OLD PREVIEW
+      ========================= */
+
+      if(previewProcess){
+
+        previewProcess.kill();
+
+      }
+
+      /* =========================
+         START SIMPLE SERVER
+      ========================= */
+
+      previewProcess =
+        spawn(
+
+          "npx",
+
+          [
+
+            "serve",
+            WORKSPACE,
+            "-l",
+            "4173"
+
+          ],
+
+          {
+
+            shell:true
+
+          }
+
+        );
+
+      previewProcess.stdout.on(
+
+        "data",
+
+        (data) => {
+
+          console.log(
+            data.toString()
+          );
+
+        }
+
+      );
+
+      previewProcess.stderr.on(
+
+        "data",
+
+        (data) => {
+
+          console.log(
+            data.toString()
+          );
+
+        }
+
+      );
+
+      /* =========================
+         URL
+      ========================= */
+
+      const url =
+        "http://localhost:4173";
+
+      res.json({
+
+        success:true,
+        url
+
+      });
+
+    } catch(err){
+
+      res.status(500).json({
+
+        success:false,
+        error:err.message
 
       });
 
