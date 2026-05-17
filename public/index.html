@@ -170,7 +170,7 @@
           </option>
 
           <option>
-            cpp
+            c++
           </option>
 
         </select>
@@ -184,7 +184,49 @@
         <button onclick="clearHistory()">
           🗑 Clear
         </button>
+<button onclick="openTerminalPanel()">
+  🖥 Terminal
+</button>
 
+<button onclick="openLivePreview()">
+  🌍 Live Preview
+</button>
+
+<button onclick="deployProject()">
+  🚀 Deploy
+</button>
+
+<button onclick="aiEditProject()">
+  🤖 AI Edit
+</button>
+
+<button onclick="openMonacoEditor()">
+  🧠 Monaco Editor
+</button>
+
+<input
+  type="file"
+  id="fileUpload"
+  hidden
+  onchange="
+    uploadFile(
+      this.files[0]
+    )
+  "
+/>
+
+<button
+  onclick="
+    document
+    .getElementById(
+      'fileUpload'
+    )
+    .click()
+  "
+>
+  📁 Upload
+</button>
+        
       </div>
 
     </div>
