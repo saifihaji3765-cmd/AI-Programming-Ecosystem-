@@ -111,7 +111,7 @@ body{
 .chat{
   flex:1;
   overflow-y:auto;
-  padding:20px;
+  padding-bottom:180px;
 }
 
 /* =========================
@@ -142,7 +142,11 @@ body{
   border-top:1px solid #1f2937;
   padding:20px;
 }
-
+position:fixed;
+bottom:0;
+left:280px;
+right:0;
+z-index:1000;
 textarea{
   width:100%;
   height:130px;
@@ -358,22 +362,27 @@ iframe{
 ========================= */
 
 @media(max-width:900px){
+.sidebar{
+  width:100%;
+  height:auto;
+  position:relative;
+}
 
-  .sidebar{
-    display:none;
+.main{
+  width:100%;
+}
+
+.input-area{
+  left:0;
+}
+
+body{
+  flex-direction:column;
+}
+
+.chat{
+  padding-bottom:240px;
+}
+  
   }
-
-  .welcome h1{
-    font-size:30px;
-  }
-
-  .controls{
-    flex-direction:column;
-  }
-
-  button,
-  select{
-    width:100%;
-  }
-
 }
