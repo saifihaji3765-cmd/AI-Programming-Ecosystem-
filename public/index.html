@@ -11,7 +11,7 @@
   />
 
   <title>
-    AI Dev Mentor Pro
+    AI Dev OS
   </title>
 
   <link
@@ -19,243 +19,287 @@
     href="styles.css"
   />
 
-  <!-- Monaco Editor -->
-
-  <script src="https://unpkg.com/monaco-editor@0.44.0/min/vs/loader.js"></script>
-
 </head>
 
 <body>
 
-  <!-- =========================
-       SIDEBAR
-  ========================== -->
+  <div class="app">
 
-  <div class="sidebar">
+    <!-- =========================
+         SIDEBAR
+    ========================== -->
 
-    <div class="logo">
-      🚀 AI Dev Mentor
-    </div>
+    <aside class="sidebar">
 
-    <div class="history">
-
-      <!-- ACTIVE PROJECT -->
-
-      <div class="active-project">
-
-        <div class="active-project-title">
-          🟢 Active Project
-        </div>
-
-        <div id="activeProjectName">
-          No project loaded
-        </div>
-
+      <div class="logo">
+        🚀 AI Dev OS
       </div>
 
-      <!-- WORKFLOW -->
+      <div class="nav-section">
 
-      <div
-        id="workflowPanel"
-        class="active-project"
-        style="margin-top:15px;"
-      >
-
-        <div class="active-project-title">
-          🧠 Suggested Steps
+        <div class="nav-title">
+          WORKSPACE
         </div>
 
-        <div id="workflowSteps">
+        <div class="nav-item active">
+          🧠 AI Workspace
+        </div>
 
-          No suggestions yet
+        <div class="nav-item">
+          📁 Files
+        </div>
 
+        <div class="nav-item">
+          🤖 Agents
+        </div>
+
+        <div class="nav-item">
+          🌍 Deployments
+        </div>
+
+        <div class="nav-item">
+          ⚡ Terminal
         </div>
 
       </div>
 
-      <!-- HISTORY -->
+      <div class="nav-section">
 
-      <div class="history-title">
-        📂 History
+        <div class="nav-title">
+          PROJECTS
+        </div>
+
+        <div id="projectList">
+
+          <div class="nav-item">
+            📦 My SaaS App
+          </div>
+
+          <div class="nav-item">
+            💻 AI Platform
+          </div>
+
+        </div>
+
       </div>
 
-      <div id="historyList"></div>
+    </aside>
 
-      <!-- FILES -->
+    <!-- =========================
+         MAIN
+    ========================== -->
 
-      <div class="history-title">
-        📁 Project Files
-      </div>
+    <main class="main">
 
-      <div id="fileExplorer"></div>
+      <!-- =========================
+           TOPBAR
+      ========================== -->
 
-    </div>
+      <header class="topbar">
+
+        <div class="project-info">
+
+          <h2>
+            AI Dev Workspace
+          </h2>
+
+          <p>
+            Autonomous AI Software Engineer
+          </p>
+
+        </div>
+
+        <div class="actions">
+
+          <button class="btn">
+            🤖 AI Agent
+          </button>
+
+          <button class="btn">
+            ▶ Run
+          </button>
+
+          <button class="btn">
+            🌍 Preview
+          </button>
+
+          <button class="btn primary">
+            🚀 Deploy
+          </button>
+
+        </div>
+
+      </header>
+
+      <!-- =========================
+           WORKSPACE
+      ========================== -->
+
+      <section class="workspace">
+
+        <!-- =========================
+             EDITOR AREA
+        ========================== -->
+
+        <div class="editor-area">
+
+          <!-- =========================
+               TABS
+          ========================== -->
+
+          <div class="tabs">
+
+            <div class="tab active">
+              index.html
+            </div>
+
+            <div class="tab">
+              styles.css
+            </div>
+
+            <div class="tab">
+              app.js
+            </div>
+
+          </div>
+
+          <!-- =========================
+               EDITOR
+          ========================== -->
+
+          <div class="editor">
+
+            <div class="hero">
+
+              <div class="hero-badge">
+                ⚡ AI Powered Development
+              </div>
+
+              <h1>
+                Build Production Apps
+                With Autonomous AI
+              </h1>
+
+              <p>
+                Generate, edit, debug,
+                deploy and scale complete
+                software systems using AI.
+              </p>
+
+            </div>
+
+            <!-- =========================
+                 PROMPT CARD
+            ========================== -->
+
+            <div class="prompt-card">
+
+              <textarea
+                id="promptInput"
+                class="prompt-input"
+                placeholder="Describe what you want to build..."
+              ></textarea>
+
+              <div class="prompt-actions">
+
+                <button class="btn primary">
+                  🚀 Generate Project
+                </button>
+
+                <button class="btn">
+                  📁 Upload
+                </button>
+
+                <button class="btn">
+                  🔗 Import GitHub
+                </button>
+
+              </div>
+
+            </div>
+
+          </div>
+
+          <!-- =========================
+               TERMINAL
+          ========================== -->
+
+          <div class="terminal">
+
+            <div>
+              > AI Dev OS Terminal
+            </div>
+
+            <br />
+
+            <div>
+              Ready...
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- =========================
+             AI PANEL
+        ========================== -->
+
+        <aside class="ai-panel">
+
+          <div class="ai-header">
+
+            <h3>
+              🤖 AI Agent
+            </h3>
+
+            <p>
+              Autonomous Software Engineer
+            </p>
+
+          </div>
+
+          <div class="chat-area">
+
+            <div class="message">
+
+              👋 Welcome to AI Dev OS.
+
+              <br /><br />
+
+              I can:
+              <br />
+              • Build apps
+              <br />
+              • Fix bugs
+              <br />
+              • Deploy projects
+              <br />
+              • Create APIs
+              <br />
+              • Generate UI systems
+
+            </div>
+
+            <div class="message">
+
+              Suggested:
+              <br /><br />
+
+              "Build a modern SaaS dashboard"
+
+            </div>
+
+          </div>
+
+        </aside>
+
+      </section>
+
+    </main>
 
   </div>
-
-  <!-- =========================
-       MAIN AREA
-  ========================== -->
-
-  <div class="main">
-
-    <!-- CHAT -->
-
-    <div
-      class="chat"
-      id="chat"
-    >
-
-      <div class="welcome">
-
-        <h1>
-          Build Anything with AI
-        </h1>
-
-        <p>
-          Generate projects, evolve systems and build complete software with AI.
-        </p>
-
-      </div>
-
-    </div>
-
-    <!-- INPUT -->
-
-    <div class="input-area">
-
-      <textarea
-        id="prompt"
-        placeholder="Ask AI anything..."
-      ></textarea>
-
-      <div class="controls">
-
-        <!-- MODE -->
-
-        <select id="mode">
-
-          <option value="analyze">
-            💻 Analyze Code
-          </option>
-
-          <option value="project">
-            🏗 Generate Project
-          </option>
-
-          <option value="review">
-            🧠 Engineering Review
-          </option>
-
-          <option value="edit">
-            ✏ Edit Project
-          </option>
-
-        </select>
-
-        <!-- LANGUAGE -->
-
-        <select id="language">
-
-          <option>
-            javascript
-          </option>
-
-          <option>
-            python
-          </option>
-
-          <option>
-            java
-          </option>
-
-          <option>
-            c++
-          </option>
-
-        </select>
-
-        <!-- BUTTONS -->
-
-        <button onclick="runAI()">
-          🚀 Run AI
-        </button>
-
-        <button onclick="clearHistory()">
-          🗑 Clear
-        </button>
-<button onclick="openTerminalPanel()">
-  🖥 Terminal
-</button>
-
-<button onclick="openLivePreview()">
-  🌍 Live Preview
-</button>
-
-<button onclick="deployProject()">
-  🚀 Deploy
-</button>
-
-<button onclick="aiEditProject()">
-  🤖 AI Edit
-</button>
-
-<button onclick="openMonacoEditor()">
-  🧠 Monaco Editor
-</button>
-
-<input
-  type="file"
-  id="fileUpload"
-  hidden
-  onchange="
-    uploadFile(
-      this.files[0]
-    )
-  "
-/>
-
-<button
-  onclick="
-    document
-    .getElementById(
-      'fileUpload'
-    )
-    .click()
-  "
->
-  📁 Upload
-</button>
-        
-      </div>
-
-    </div>
-
-  </div>
-
-  <!-- =========================
-       SCRIPTS
-  ========================== -->
 
   <script src="app.js"></script>
 
-  <script src="tabs.js"></script>
-
-  <script src="editor.js"></script>
-
-  <script src="explorer.js"></script>
-
-  <script src="terminal.js"></script>
-
-  <script src="preview.js"></script>
-<script src="ai-editor.js"></script>
-<script src="terminal-stream.js"></script>
-<script src="terminal-ui.js"></script>
-<script src="upload.js"></script>
-<script src="live-preview.js"></script>
-<script src="deploy.js"></script>
-
-
 </body>
-
 </html>
