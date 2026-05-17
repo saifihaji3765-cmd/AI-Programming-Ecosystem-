@@ -243,6 +243,128 @@ function openFile(fileName){
   );
 
   // =========================
+  // CREATE TAB
+  // =========================
+
+  if(
+    !openTabs.includes(fileName)
+  ){
+
+    openTabs.push(fileName);
+
+    createTab(fileName);
+
+  }
+
+  // =========================
+  // ACTIVATE TAB
+  // =========================
+
+  activateTab(fileName);
+
+}
+
+// =========================
+// CREATE TAB
+// =========================
+
+function createTab(fileName){
+
+  const tabs =
+  document.querySelector(".tabs");
+
+  // REMOVE WELCOME TAB
+
+  const welcome =
+  document.getElementById(
+    "welcomeTab"
+  );
+
+  if(welcome){
+
+    welcome.remove();
+
+  }
+
+  // =========================
+  // TAB
+  // =========================
+
+  const tab =
+  document.createElement("div");
+
+  tab.className = "tab";
+
+  tab.id = "tab-" + fileName;
+
+  tab.innerHTML = `
+  
+    ${fileName}
+    
+    <span
+      onclick="
+        closeTab(
+          '${fileName}'
+        )
+      "
+      style="
+        margin-left:10px;
+        cursor:pointer;
+      "
+    >
+      ✕
+    </span>
+
+  `;
+
+  tab.onclick = () => {
+
+    activateTab(fileName);
+
+  };
+
+  tabs.appendChild(tab);
+
+}
+
+// =========================
+// ACTIVATE TAB
+// =========================
+
+function activateTab(fileName){
+
+  // =========================
+  // REMOVE ACTIVE
+  // =========================
+
+  document
+  .querySelectorAll(".tab")
+  .forEach(tab=>{
+
+    tab.classList.remove(
+      "active"
+    );
+
+  });
+
+  // =========================
+  // ACTIVE TAB
+  // =========================
+
+  const activeTab =
+  document.getElementById(
+    "tab-" + fileName
+  );
+
+  if(activeTab){
+
+    activeTab.classList.add(
+      "active"
+    );
+
+  }
+
+  // =========================
   // DETECT LANGUAGE
   // =========================
 
@@ -257,13 +379,17 @@ function openFile(fileName){
   }
 
   // =========================
-  // SET MODEL
+  // SET LANGUAGE
   // =========================
 
   monaco.editor.setModelLanguage(
     editor.getModel(),
     language
   );
+
+  // =========================
+  // LOAD FILE
+  // =========================
 
   editor.setValue(
     files[fileName]
@@ -277,6 +403,71 @@ function openFile(fileName){
 `
 > Opened ${fileName}
 `
+  );
+
+}
+
+// =========================
+// CLOSE TAB
+// =========================
+
+function closeTab(fileName){
+
+  event.stopPropagation();
+
+  // =========================
+  // REMOVE TAB
+  // =========================
+
+  openTabs =
+  openTabs.filter(
+    tab => tab !== fileName
+  );
+
+  const tab =
+  document.getElementById(
+    "tab-" + fileName
+  );
+
+  if(tab){
+
+    tab.remove();
+
+  }
+
+  // =========================
+  // EMPTY
+  // =========================
+
+  if(openTabs.length === 0){
+
+    document
+    .querySelector(".tabs")
+    .innerHTML = `
+
+      <div
+        class="tab active"
+        id="welcomeTab"
+      >
+        Welcome
+      </div>
+
+    `;
+
+    editor.setValue("");
+
+    return;
+
+  }
+
+  // =========================
+  // ACTIVATE LAST TAB
+  // =========================
+
+  activateTab(
+    openTabs[
+      openTabs.length - 1
+    ]
   );
 
 }
