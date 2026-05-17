@@ -2,23 +2,16 @@
 <html lang="en">
 
 <head>
-
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
-  />
+  <title>AI Dev Mentor</title>
 
-  <title>
-    AI Dev OS
-  </title>
+  <!-- CSS -->
+  <link rel="stylesheet" href="/styles.css" />
 
-  <link
-    rel="stylesheet"
-    href="styles.css"
-  />
-
+  <!-- Monaco Editor -->
+  <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs/loader.js"></script>
 </head>
 
 <body>
@@ -32,7 +25,7 @@
     <aside class="sidebar">
 
       <div class="logo">
-        🚀 AI Dev OS
+        🚀 AI Dev Mentor
       </div>
 
       <div class="nav-section">
@@ -42,23 +35,23 @@
         </div>
 
         <div class="nav-item active">
-          🧠 AI Workspace
+          🏠 Dashboard
         </div>
 
         <div class="nav-item">
-          📁 Files
+          📁 Projects
         </div>
 
         <div class="nav-item">
-          🤖 Agents
+          🤖 AI Agents
         </div>
 
         <div class="nav-item">
-          🌍 Deployments
+          🌐 Deployments
         </div>
 
         <div class="nav-item">
-          ⚡ Terminal
+          ⚙ Settings
         </div>
 
       </div>
@@ -66,19 +59,23 @@
       <div class="nav-section">
 
         <div class="nav-title">
-          PROJECTS
+          AI SYSTEMS
         </div>
 
-        <div id="projectList">
+        <div class="nav-item">
+          🧠 Autonomous Agent
+        </div>
 
-          <div class="nav-item">
-            📦 My SaaS App
-          </div>
+        <div class="nav-item">
+          ⚡ AI Builder
+        </div>
 
-          <div class="nav-item">
-            💻 AI Platform
-          </div>
+        <div class="nav-item">
+          💻 Code Generator
+        </div>
 
+        <div class="nav-item">
+          🚀 One Click Deploy
         </div>
 
       </div>
@@ -95,32 +92,30 @@
            TOPBAR
       ========================== -->
 
-      <header class="topbar">
+      <div class="topbar">
 
         <div class="project-info">
-
           <h2>
-            AI Dev Workspace
+            Build Anything with AI
           </h2>
 
           <p>
-            Autonomous AI Software Engineer
+            AI-powered autonomous software engineering platform
           </p>
-
         </div>
 
         <div class="actions">
 
           <button class="btn">
-            🤖 AI Agent
+            📁 Import
           </button>
 
           <button class="btn">
-            ▶ Run
+            🔄 Sync
           </button>
 
           <button class="btn">
-            🌍 Preview
+            ⚡ Preview
           </button>
 
           <button class="btn primary">
@@ -129,13 +124,13 @@
 
         </div>
 
-      </header>
+      </div>
 
       <!-- =========================
            WORKSPACE
       ========================== -->
 
-      <section class="workspace">
+      <div class="workspace">
 
         <!-- =========================
              EDITOR AREA
@@ -161,6 +156,10 @@
               app.js
             </div>
 
+            <div class="tab">
+              server.js
+            </div>
+
           </div>
 
           <!-- =========================
@@ -169,49 +168,52 @@
 
           <div class="editor">
 
+            <!-- HERO -->
+
             <div class="hero">
 
               <div class="hero-badge">
-                ⚡ AI Powered Development
+                ✨ Next Generation AI Software Engineer
               </div>
 
               <h1>
-                Build Production Apps
-                With Autonomous AI
+                Build Production Apps<br/>
+                With One Prompt
               </h1>
 
               <p>
-                Generate, edit, debug,
-                deploy and scale complete
-                software systems using AI.
+                Create SaaS apps, AI agents, websites, mobile apps,
+                dashboards, APIs and complete startups using autonomous AI.
               </p>
 
             </div>
 
-            <!-- =========================
-                 PROMPT CARD
-            ========================== -->
+            <!-- PROMPT CARD -->
 
             <div class="prompt-card">
 
               <textarea
-                id="promptInput"
                 class="prompt-input"
+                id="promptInput"
                 placeholder="Describe what you want to build..."
               ></textarea>
 
               <div class="prompt-actions">
 
-                <button class="btn primary">
-                  🚀 Generate Project
+                <button class="btn primary" id="generateBtn">
+                  ⚡ Generate App
                 </button>
 
                 <button class="btn">
-                  📁 Upload
+                  🤖 AI Agent
                 </button>
 
                 <button class="btn">
-                  🔗 Import GitHub
+                  🌐 Full Stack
+                </button>
+
+                <button class="btn">
+                  📱 Mobile App
                 </button>
 
               </div>
@@ -224,17 +226,9 @@
                TERMINAL
           ========================== -->
 
-          <div class="terminal">
+          <div class="terminal" id="terminal">
 
-            <div>
-              > AI Dev OS Terminal
-            </div>
-
-            <br />
-
-            <div>
-              Ready...
-            </div>
+            > AI Dev Mentor Terminal Ready...
 
           </div>
 
@@ -249,11 +243,11 @@
           <div class="ai-header">
 
             <h3>
-              🤖 AI Agent
+              🤖 AI Assistant
             </h3>
 
             <p>
-              Autonomous Software Engineer
+              Autonomous engineering system
             </p>
 
           </div>
@@ -261,45 +255,33 @@
           <div class="chat-area">
 
             <div class="message">
+              Welcome to AI Dev Mentor.<br/><br/>
 
-              👋 Welcome to AI Dev OS.
+              Your AI system can:
+              <br/><br/>
 
-              <br /><br />
-
-              I can:
-              <br />
-              • Build apps
-              <br />
-              • Fix bugs
-              <br />
-              • Deploy projects
-              <br />
-              • Create APIs
-              <br />
-              • Generate UI systems
-
-            </div>
-
-            <div class="message">
-
-              Suggested:
-              <br /><br />
-
-              "Build a modern SaaS dashboard"
-
+              • Generate apps<br/>
+              • Create backend systems<br/>
+              • Build APIs<br/>
+              • Deploy websites<br/>
+              • Create databases<br/>
+              • Build AI agents<br/>
+              • Generate production code
             </div>
 
           </div>
 
         </aside>
 
-      </section>
+      </div>
 
     </main>
 
   </div>
 
-  <script src="app.js"></script>
+  <!-- JS -->
+  <script src="/app.js"></script>
 
 </body>
+
 </html>
