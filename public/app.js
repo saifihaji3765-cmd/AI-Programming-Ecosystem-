@@ -178,3 +178,101 @@ generateBtn.addEventListener("click", async ()=>{
   },2000);
 
 });
+// =========================
+// FILE SYSTEM
+// =========================
+
+const files = {
+
+  "index.html":
+`<!DOCTYPE html>
+<html>
+<head>
+  <title>AI Dev Mentor</title>
+</head>
+
+<body>
+
+  <h1>
+    AI Dev Mentor 🚀
+  </h1>
+
+</body>
+</html>`,
+
+  "styles.css":
+`body{
+  background:black;
+  color:white;
+}`,
+
+  "app.js":
+`console.log("AI Dev Mentor");`,
+
+  "server.js":
+`const express = require("express");`
+
+};
+
+// =========================
+// OPEN FILE
+// =========================
+
+function openFile(fileName){
+
+  // =========================
+  // ACTIVE FILE UI
+  // =========================
+
+  document
+  .querySelectorAll(".file")
+  .forEach(file=>{
+
+    file.classList.remove(
+      "active-file"
+    );
+
+  });
+
+  event.target.classList.add(
+    "active-file"
+  );
+
+  // =========================
+  // DETECT LANGUAGE
+  // =========================
+
+  let language = "javascript";
+
+  if(fileName.endsWith(".html")){
+    language = "html";
+  }
+
+  if(fileName.endsWith(".css")){
+    language = "css";
+  }
+
+  // =========================
+  // SET MODEL
+  // =========================
+
+  monaco.editor.setModelLanguage(
+    editor.getModel(),
+    language
+  );
+
+  editor.setValue(
+    files[fileName]
+  );
+
+  // =========================
+  // TERMINAL
+  // =========================
+
+  addTerminalLog(
+`
+> Opened ${fileName}
+`
+  );
+
+}
