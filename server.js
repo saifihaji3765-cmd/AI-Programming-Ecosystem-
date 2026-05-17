@@ -104,28 +104,44 @@ let activeProject = {
 };
 
 /* =========================
-   LOAD FILES
+   AGENT LOGS
+========================= */
+
+let agentLogs = "";
+
+/* =========================
+   LOAD WORKSPACE FILES
 ========================= */
 
 function loadWorkspaceFiles(){
 
-  const files =
-    fs.readdirSync(
-      WORKSPACE
-    );
+  function readDir(dir){
 
-  activeProject.files =
-    files.map(file => {
+    const items =
+      fs.readdirSync(dir);
 
-      const filePath =
+    let results = [];
+
+    for(
+      const item
+      of items
+    ){
+
+      const itemPath =
         path.join(
-          WORKSPACE,
-          file
+          dir,
+          item
         );
 
       const stat =
         fs.statSync(
-          filePath
+          itemPath
+        );
+
+      const relative =
+        path.relative(
+          WORKSPACE,
+          itemPath
         );
 
       /* =========================
@@ -134,13 +150,18 @@ function loadWorkspaceFiles(){
 
       if(stat.isDirectory()){
 
-        return {
+        results.push({
 
-          name:file,
+          name:relative,
           type:"folder",
           content:""
 
-        };
+        });
+
+        results =
+          results.concat(
+            readDir(itemPath)
+          );
 
       }
 
@@ -148,20 +169,31 @@ function loadWorkspaceFiles(){
          FILE
       ========================= */
 
-      return {
+      else {
 
-        name:file,
-        type:"file",
+        results.push({
 
-        content:
-          fs.readFileSync(
-            filePath,
-            "utf-8"
-          )
+          name:relative,
+          type:"file",
 
-      };
+          content:
+            fs.readFileSync(
+              itemPath,
+              "utf-8"
+            )
 
-    });
+        });
+
+      }
+
+    }
+
+    return results;
+
+  }
+
+  activeProject.files =
+    readDir(WORKSPACE);
 
 }
 
@@ -209,6 +241,26 @@ app.post(
           WORKSPACE,
           fileName
         );
+
+      const dir =
+        path.dirname(
+          filePath
+        );
+
+      if(
+        !fs.existsSync(
+          dir
+        )
+      ){
+
+        fs.mkdirSync(
+          dir,
+          {
+            recursive:true
+          }
+        );
+
+      }
 
       fs.writeFileSync(
         filePath,
@@ -259,6 +311,26 @@ app.post(
           WORKSPACE,
           name
         );
+
+      const dir =
+        path.dirname(
+          filePath
+        );
+
+      if(
+        !fs.existsSync(
+          dir
+        )
+      ){
+
+        fs.mkdirSync(
+          dir,
+          {
+            recursive:true
+          }
+        );
+
+      }
 
       fs.writeFileSync(
         filePath,
@@ -316,7 +388,10 @@ app.post(
       ){
 
         fs.mkdirSync(
-          folderPath
+          folderPath,
+          {
+            recursive:true
+          }
         );
 
       }
@@ -652,7 +727,7 @@ ${code}
         ],
 
         fixes:[
-          "Check API key"
+          "Check OpenAI API"
         ],
 
         explanation:[
@@ -664,6 +739,212 @@ ${code}
       });
 
     }
+
+  }
+
+);
+
+/* =========================
+   AUTONOMOUS AGENT
+========================= */
+
+app.post(
+
+  "/autonomous-agent",
+
+  async (req,res) => {
+
+    try {
+
+      const {
+        prompt
+      } = req.body;
+
+      agentLogs = `
+🤖 Agent Started...
+`;
+
+      const completion =
+        await openai.chat.completions.create({
+
+          model:
+            "gpt-4.1-mini",
+
+          messages:[
+
+            {
+
+              role:"system",
+
+              content:`
+
+You are an autonomous AI software engineer.
+
+Generate a professional project structure.
+
+Return ONLY valid JSON.
+
+Format:
+
+{
+  "projectName":"",
+  "files":[
+    {
+      "name":"",
+      "content":""
+    }
+  ]
+}
+
+              `
+
+            },
+
+            {
+
+              role:"user",
+
+              content:prompt
+
+            }
+
+          ],
+
+          temperature:0.4
+
+        });
+
+      agentLogs += `
+🧠 AI planning completed...
+`;
+
+      const text =
+        completion
+        .choices[0]
+        .message
+        .content;
+
+      const cleaned =
+        text
+        .replace(/```json/g,"")
+        .replace(/```/g,"")
+        .trim();
+
+      const parsed =
+        JSON.parse(
+          cleaned
+        );
+
+      /* =========================
+         SAVE FILES
+      ========================= */
+
+      for(
+        const file
+        of parsed.files
+      ){
+
+        const filePath =
+          path.join(
+            WORKSPACE,
+            file.name
+          );
+
+        const dir =
+          path.dirname(
+            filePath
+          );
+
+        if(
+          !fs.existsSync(
+            dir
+          )
+        ){
+
+          fs.mkdirSync(
+            dir,
+            {
+              recursive:true
+            }
+          );
+
+        }
+
+        fs.writeFileSync(
+
+          filePath,
+
+          file.content || ""
+
+        );
+
+        agentLogs += `
+✔ Created:
+${file.name}
+`;
+
+      }
+
+      activeProject.projectName =
+        parsed.projectName;
+
+      loadWorkspaceFiles();
+
+      agentLogs += `
+🚀 Project Ready
+`;
+
+      res.json({
+
+        success:true,
+
+        summary:
+`
+Project:
+${parsed.projectName}
+
+Files Generated:
+${parsed.files.length}
+`
+
+      });
+
+    } catch(err){
+
+      console.log(err);
+
+      agentLogs += `
+❌ Agent Failed
+`;
+
+      res.status(500).json({
+
+        success:false,
+        error:err.message
+
+      });
+
+    }
+
+  }
+
+);
+
+/* =========================
+   AGENT STATUS
+========================= */
+
+app.get(
+
+  "/agent-status",
+
+  (req,res) => {
+
+    res.json({
+
+      logs:agentLogs
+
+    });
 
   }
 
