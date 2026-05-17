@@ -1,13 +1,36 @@
+/* =========================
+   GOOGLE FONT
+========================= */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+/* =========================
+   RESET
+========================= */
+
 *{
   margin:0;
   padding:0;
   box-sizing:border-box;
-  font-family:Arial,sans-serif;
 }
 
+/* =========================
+   BODY
+========================= */
+
 body{
-  background:#0f172a;
+  background:#0a0a0a;
   color:white;
+  font-family:'Inter',sans-serif;
+  overflow:hidden;
+}
+
+/* =========================
+   APP LAYOUT
+========================= */
+
+.app{
+  width:100%;
   height:100vh;
   display:flex;
   overflow:hidden;
@@ -19,86 +42,60 @@ body{
 
 .sidebar{
   width:280px;
-  background:#111827;
-  border-right:1px solid #1f2937;
+  background:#0f0f0f;
+  border-right:1px solid rgba(255,255,255,0.06);
   display:flex;
   flex-direction:column;
-  overflow:hidden;
+  padding:22px;
 }
+
+/* =========================
+   LOGO
+========================= */
 
 .logo{
-  padding:22px;
-  font-size:24px;
-  font-weight:bold;
-  border-bottom:1px solid #1f2937;
-}
-
-.history{
-  flex:1;
-  overflow-y:auto;
-  padding:18px;
-}
-
-.history-title{
-  color:#60a5fa;
-  margin-bottom:16px;
-  margin-top:18px;
-  font-size:18px;
-}
-
-.history-item{
-  background:#1f2937;
-  padding:14px;
-  border-radius:12px;
-  margin-bottom:12px;
-  cursor:pointer;
-  transition:0.2s;
-}
-
-.history-item:hover{
-  background:#374151;
+  font-size:30px;
+  font-weight:800;
+  margin-bottom:35px;
+  letter-spacing:-1px;
 }
 
 /* =========================
-   ACTIVE PROJECT
+   NAV
 ========================= */
 
-.active-project{
-  background:#0f172a;
-  border:1px solid #334155;
-  border-radius:12px;
-  padding:14px;
-  margin-bottom:18px;
+.nav-section{
+  margin-bottom:34px;
 }
 
-.active-project-title{
-  color:#22c55e;
-  margin-bottom:8px;
-  font-weight:bold;
+.nav-title{
+  color:#666;
+  font-size:12px;
+  margin-bottom:14px;
+  letter-spacing:1px;
 }
 
-/* =========================
-   FILE EXPLORER
-========================= */
-
-.file-item{
-  background:#0f172a;
-  border:1px solid #334155;
-  padding:12px;
-  border-radius:10px;
+.nav-item{
+  padding:14px 16px;
+  border-radius:16px;
   margin-bottom:10px;
   cursor:pointer;
-  font-size:14px;
-  color:#cbd5e1;
-  transition:0.2s;
+  transition:0.25s;
+  color:#d4d4d4;
+  font-weight:500;
 }
 
-.file-item:hover{
-  background:#1e293b;
+.nav-item:hover{
+  background:#171717;
+}
+
+.nav-item.active{
+  background:#7c3aed;
+  color:white;
 }
 
 /* =========================
-   MAIN AREA
+   MAIN
 ========================= */
 
 .main{
@@ -108,90 +105,282 @@ body{
   overflow:hidden;
 }
 
-.chat{
-  flex:1;
-  overflow-y:auto;
-  padding-bottom:180px;
-}
-
 /* =========================
-   WELCOME
+   TOPBAR
 ========================= */
 
-.welcome{
-  text-align:center;
-  margin-top:80px;
-}
-
-.welcome h1{
-  font-size:42px;
-  margin-bottom:12px;
-}
-
-.welcome p{
-  color:#94a3b8;
-  font-size:18px;
-}
-
-/* =========================
-   INPUT AREA
-========================= */
-
-.input-area{
-  background:#111827;
-  border-top:1px solid #1f2937;
-  padding:20px;
-}
-position:fixed;
-bottom:0;
-left:280px;
-right:0;
-z-index:1000;
-textarea{
-  width:100%;
-  height:130px;
-  background:#1f2937;
-  color:white;
-  border:none;
-  outline:none;
-  resize:none;
-  border-radius:16px;
-  padding:18px;
-  font-size:16px;
-}
-
-/* =========================
-   CONTROLS
-========================= */
-
-.controls{
+.topbar{
+  height:78px;
+  border-bottom:1px solid rgba(255,255,255,0.06);
   display:flex;
-  flex-wrap:wrap;
-  gap:10px;
-  margin-top:15px;
+  justify-content:space-between;
+  align-items:center;
+  padding:0 24px;
+  background:#0d0d0d;
 }
 
-button{
-  background:#2563eb;
+/* =========================
+   PROJECT INFO
+========================= */
+
+.project-info h2{
+  font-size:20px;
+  margin-bottom:5px;
+}
+
+.project-info p{
+  color:#777;
+  font-size:14px;
+}
+
+/* =========================
+   ACTIONS
+========================= */
+
+.actions{
+  display:flex;
+  gap:12px;
+}
+
+/* =========================
+   BUTTONS
+========================= */
+
+.btn{
+  background:#171717;
+  border:1px solid rgba(255,255,255,0.06);
   color:white;
-  border:none;
+  border-radius:14px;
   padding:12px 18px;
-  border-radius:10px;
   cursor:pointer;
-  font-weight:bold;
-  transition:0.2s;
+  transition:0.25s;
+  font-weight:600;
 }
 
-button:hover{
+.btn:hover{
+  background:#232323;
+}
+
+.btn.primary{
+  background:#7c3aed;
+  border:none;
+}
+
+.btn.primary:hover{
   opacity:0.9;
 }
 
-select{
-  background:#1f2937;
+/* =========================
+   WORKSPACE
+========================= */
+
+.workspace{
+  flex:1;
+  display:flex;
+  overflow:hidden;
+}
+
+/* =========================
+   EDITOR AREA
+========================= */
+
+.editor-area{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+}
+
+/* =========================
+   TABS
+========================= */
+
+.tabs{
+  height:58px;
+  border-bottom:1px solid rgba(255,255,255,0.06);
+  display:flex;
+  align-items:center;
+  padding:0 12px;
+  overflow-x:auto;
+  background:#0c0c0c;
+}
+
+.tab{
+  background:#171717;
+  border:1px solid rgba(255,255,255,0.05);
+  padding:10px 16px;
+  border-radius:12px;
+  margin-right:10px;
+  cursor:pointer;
+  white-space:nowrap;
+  color:#aaa;
+  transition:0.25s;
+}
+
+.tab:hover{
+  background:#222;
+}
+
+.tab.active{
+  background:#7c3aed;
   color:white;
+}
+
+/* =========================
+   EDITOR
+========================= */
+
+.editor{
+  flex:1;
+  overflow:auto;
+  padding:34px;
+  background:#0a0a0a;
+}
+
+/* =========================
+   HERO
+========================= */
+
+.hero{
+  max-width:900px;
+  margin:auto;
+  margin-top:30px;
+  text-align:center;
+}
+
+/* =========================
+   HERO BADGE
+========================= */
+
+.hero-badge{
+  display:inline-block;
+  padding:10px 18px;
+  background:#171717;
+  border:1px solid rgba(255,255,255,0.06);
+  border-radius:999px;
+  margin-bottom:24px;
+  color:#b892ff;
+  font-size:14px;
+}
+
+/* =========================
+   HERO TITLE
+========================= */
+
+.hero h1{
+  font-size:64px;
+  line-height:1.1;
+  margin-bottom:22px;
+  letter-spacing:-2px;
+}
+
+/* =========================
+   HERO TEXT
+========================= */
+
+.hero p{
+  color:#888;
+  font-size:20px;
+  line-height:1.7;
+  max-width:760px;
+  margin:auto;
+}
+
+/* =========================
+   PROMPT CARD
+========================= */
+
+.prompt-card{
+  max-width:950px;
+  margin:auto;
+  margin-top:50px;
+  background:#111111;
+  border:1px solid rgba(255,255,255,0.06);
+  border-radius:28px;
+  padding:24px;
+}
+
+/* =========================
+   INPUT
+========================= */
+
+.prompt-input{
+  width:100%;
+  height:180px;
+  background:#171717;
   border:none;
-  padding:12px;
-  border-radius:10px;
+  outline:none;
+  resize:none;
+  border-radius:20px;
+  padding:22px;
+  color:white;
+  font-size:17px;
+  margin-bottom:20px;
+}
+
+/* =========================
+   PROMPT ACTIONS
+========================= */
+
+.prompt-actions{
+  display:flex;
+  gap:14px;
+  flex-wrap:wrap;
+}
+
+/* =========================
+   TERMINAL
+========================= */
+
+.terminal{
+  height:220px;
+  background:black;
+  border-top:1px solid rgba(255,255,255,0.06);
+  padding:22px;
+  overflow:auto;
+  font-family:monospace;
+  color:#00ff90;
+}
+
+/* =========================
+   AI PANEL
+========================= */
+
+.ai-panel{
+  width:370px;
+  background:#0d0d0d;
+  border-left:1px solid rgba(255,255,255,0.06);
+  display:flex;
+  flex-direction:column;
+}
+
+/* =========================
+   AI HEADER
+========================= */
+
+.ai-header{
+  padding:24px;
+  border-bottom:1px solid rgba(255,255,255,0.06);
+}
+
+.ai-header h3{
+  margin-bottom:6px;
+  font-size:20px;
+}
+
+.ai-header p{
+  color:#777;
+  font-size:14px;
+}
+
+/* =========================
+   CHAT AREA
+========================= */
+
+.chat-area{
+  flex:1;
+  overflow:auto;
+  padding:20px;
 }
 
 /* =========================
@@ -199,144 +388,13 @@ select{
 ========================= */
 
 .message{
-  background:#111827;
-  border:1px solid #1f2937;
+  background:#151515;
+  border:1px solid rgba(255,255,255,0.05);
   border-radius:18px;
-  padding:22px;
-  margin-bottom:22px;
-  animation:fadeIn 0.2s ease;
-}
-
-@keyframes fadeIn{
-
-  from{
-    opacity:0;
-    transform:translateY(10px);
-  }
-
-  to{
-    opacity:1;
-    transform:translateY(0);
-  }
-
-}
-
-/* =========================
-   SECTIONS
-========================= */
-
-.section{
-  margin-top:22px;
-}
-
-.section-title{
-  color:#60a5fa;
-  font-size:20px;
-  margin-bottom:10px;
-  font-weight:bold;
-}
-
-/* =========================
-   CODE BOX
-========================= */
-
-.code-box{
-  background:#020617;
-  border:1px solid #334155;
-  border-radius:14px;
-  overflow:hidden;
-}
-
-.code-top{
-  background:#111827;
-  border-bottom:1px solid #1f2937;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  padding:12px 16px;
-}
-
-.copy-btn{
-  background:#2563eb;
-  padding:8px 12px;
-  border-radius:8px;
-  font-size:14px;
-}
-
-/* =========================
-   PRE
-========================= */
-
-pre{
-  overflow-x:auto;
-  white-space:pre-wrap;
-  line-height:1.6;
-  padding:18px;
-  color:#e2e8f0;
-}
-
-/* =========================
-   TABS SYSTEM
-========================= */
-
-.tabs-bar{
-  display:flex;
-  gap:2px;
-  background:#0f172a;
-  border-bottom:1px solid #1f2937;
-  overflow-x:auto;
-}
-
-.tab{
-  padding:12px 18px;
-  background:#111827;
-  color:#94a3b8;
-  cursor:pointer;
-  border-right:1px solid #1f2937;
-  white-space:nowrap;
-  font-size:14px;
-  transition:0.2s;
-}
-
-.tab:hover{
-  background:#1e293b;
-}
-
-.tab.active{
-  background:#2563eb;
-  color:white;
-}
-
-.editor-container{
-  height:600px;
-  width:100%;
-}
-
-/* =========================
-   TERMINAL
-========================= */
-
-.terminal-box{
-  background:black;
-  color:#22c55e;
-  padding:18px;
-  border-radius:12px;
-  height:350px;
-  overflow-y:auto;
-  font-family:monospace;
-  line-height:1.6;
-  border:1px solid #334155;
-}
-
-/* =========================
-   IFRAME PREVIEW
-========================= */
-
-iframe{
-  width:100%;
-  height:700px;
-  border:none;
-  background:white;
+  padding:20px;
+  line-height:1.8;
+  margin-bottom:18px;
+  color:#ddd;
 }
 
 /* =========================
@@ -348,12 +406,8 @@ iframe{
   height:8px;
 }
 
-::-webkit-scrollbar-track{
-  background:#111827;
-}
-
 ::-webkit-scrollbar-thumb{
-  background:#334155;
+  background:#2a2a2a;
   border-radius:20px;
 }
 
@@ -361,28 +415,66 @@ iframe{
    MOBILE
 ========================= */
 
-@media(max-width:900px){
-.sidebar{
-  width:100%;
-  height:auto;
-  position:relative;
-}
+@media(max-width:1200px){
 
-.main{
-  width:100%;
-}
-
-.input-area{
-  left:0;
-}
-
-body{
-  flex-direction:column;
-}
-
-.chat{
-  padding-bottom:240px;
-}
-  
+  .ai-panel{
+    display:none;
   }
+
+}
+
+@media(max-width:900px){
+
+  body{
+    overflow:auto;
+  }
+
+  .app{
+    flex-direction:column;
+    height:auto;
+  }
+
+  .sidebar{
+    width:100%;
+    border-right:none;
+    border-bottom:1px solid rgba(255,255,255,0.06);
+  }
+
+  .topbar{
+    height:auto;
+    flex-direction:column;
+    align-items:flex-start;
+    gap:18px;
+    padding:20px;
+  }
+
+  .actions{
+    width:100%;
+    overflow:auto;
+  }
+
+  .workspace{
+    flex-direction:column;
+  }
+
+  .hero h1{
+    font-size:42px;
+  }
+
+  .hero p{
+    font-size:17px;
+  }
+
+  .editor{
+    padding:20px;
+  }
+
+  .prompt-card{
+    padding:18px;
+  }
+
+  .terminal{
+    height:180px;
+  }
+
 }
