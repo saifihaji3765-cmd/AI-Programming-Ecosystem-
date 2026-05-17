@@ -975,7 +975,215 @@ app.get(
   }
 
 );
+/* =========================
+   AI SELF EDIT PROJECT
+========================= */
 
+app.post(
+
+  "/ai-edit-project",
+
+  async (req,res) => {
+
+    try {
+
+      const {
+        prompt
+      } = req.body;
+
+      agentLogs = `
+🤖 AI Editing Started...
+`;
+
+      /* =========================
+         LOAD WORKSPACE FILES
+      ========================= */
+
+      loadWorkspaceFiles();
+
+      const projectFiles =
+        activeProject.files
+        .filter(
+          file =>
+            file.type === "file"
+        )
+        .map(file => ({
+
+          name:file.name,
+          content:file.content
+
+        }));
+
+      agentLogs += `
+📂 Workspace scanned...
+`;
+
+      /* =========================
+         OPENAI
+      ========================= */
+
+      const completion =
+        await openai.chat.completions.create({
+
+          model:
+            "gpt-4.1-mini",
+
+          messages:[
+
+            {
+
+              role:"system",
+
+              content:`
+
+You are an elite autonomous AI software engineer.
+
+You must edit existing project files.
+
+Return ONLY valid JSON.
+
+Format:
+
+{
+  "summary":"",
+  "files":[
+    {
+      "name":"",
+      "content":""
+    }
+  ]
+}
+
+              `
+
+            },
+
+            {
+
+              role:"user",
+
+              content:`
+
+TASK:
+${prompt}
+
+PROJECT FILES:
+${JSON.stringify(projectFiles)}
+
+              `
+
+            }
+
+          ],
+
+          temperature:0.3
+
+        });
+
+      agentLogs += `
+🧠 AI generated edits...
+`;
+
+      const text =
+        completion
+        .choices[0]
+        .message
+        .content;
+
+      const cleaned =
+        text
+        .replace(/```json/g,"")
+        .replace(/```/g,"")
+        .trim();
+
+      const parsed =
+        JSON.parse(cleaned);
+
+      /* =========================
+         SAVE UPDATED FILES
+      ========================= */
+
+      for(
+        const file
+        of parsed.files
+      ){
+
+        const filePath =
+          path.join(
+            WORKSPACE,
+            file.name
+          );
+
+        const dir =
+          path.dirname(
+            filePath
+          );
+
+        if(
+          !fs.existsSync(
+            dir
+          )
+        ){
+
+          fs.mkdirSync(
+            dir,
+            {
+              recursive:true
+            }
+          );
+
+        }
+
+        fs.writeFileSync(
+
+          filePath,
+
+          file.content || ""
+
+        );
+
+        agentLogs += `
+✔ Updated:
+${file.name}
+`;
+
+      }
+
+      loadWorkspaceFiles();
+
+      agentLogs += `
+🚀 Project Updated
+`;
+
+      res.json({
+
+        success:true,
+
+        summary:
+          parsed.summary
+
+      });
+
+    } catch(err){
+
+      console.log(err);
+
+      agentLogs += `
+❌ AI Edit Failed
+`;
+
+      res.status(500).json({
+
+        success:false,
+        error:err.message
+
+      });
+
+    }
+
+  }
+
+);
 /* =========================
    START SERVER
 ========================= */
