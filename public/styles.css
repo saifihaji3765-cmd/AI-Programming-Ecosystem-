@@ -554,3 +554,31 @@ body{
   background:#7c3aed;
   color:white;
 }
+/* =========================
+   EXPLORER HEADER
+========================= */
+
+.explorer-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+/* =========================
+   NEW FILE BUTTON
+========================= */
+
+.new-file-btn{
+  width:28px;
+  height:28px;
+  border:none;
+  border-radius:8px;
+  background:#171717;
+  color:white;
+  cursor:pointer;
+  transition:0.25s;
+}
+
+.new-file-btn:hover{
+  background:#7c3aed;
+}
