@@ -8,6 +8,11 @@ let editor;
 // =========================
 
 let openTabs = [];
+// =========================
+// CURRENT FILE
+// =========================
+
+let currentFile = null;
 require.config({
   paths: {
     vs: "https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs"
@@ -332,6 +337,14 @@ function createTab(fileName){
 // =========================
 
 function activateTab(fileName){
+// =========================
+// CURRENT FILE
+// =========================
+
+currentFile = fileName;
+  editor.setValue(
+  files[fileName]
+);
 
   // =========================
   // REMOVE ACTIVE
@@ -541,6 +554,52 @@ function createNewFile(){
 `
 > Created ${fileName}
 `
+  );
+
+}
+// =========================
+// SAVE FILE
+// =========================
+
+function saveCurrentFile(){
+
+  // =========================
+  // NO FILE
+  // =========================
+
+  if(!currentFile){
+
+    alert(
+      "No file open"
+    );
+
+    return;
+
+  }
+
+  // =========================
+  // SAVE CONTENT
+  // =========================
+
+  files[currentFile] =
+  editor.getValue();
+
+  // =========================
+  // TERMINAL
+  // =========================
+
+  addTerminalLog(
+`
+> Saved ${currentFile}
+`
+  );
+
+  // =========================
+  // SUCCESS
+  // =========================
+
+  alert(
+    `${currentFile} saved`
   );
 
 }
