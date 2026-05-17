@@ -1,403 +1,180 @@
-/* =========================
-   GLOBAL STATE
-========================= */
+// =========================
+// MONACO EDITOR
+// =========================
 
-let historyData = JSON.parse(
-  localStorage.getItem("ai_history")
-) || [];
+let editor;
 
-let activeProject = null;
+require.config({
+  paths: {
+    vs: "https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs"
+  }
+});
 
-/* =========================
-   SAVE HISTORY
-========================= */
+require(["vs/editor/editor.main"], function () {
 
-function saveHistory(
-  title,
-  content
-){
+  // =========================
+  // CREATE EDITOR CONTAINER
+  // =========================
 
-  historyData.unshift({
+  const editorContainer = document.createElement("div");
 
-    title,
-    content
+  editorContainer.id = "monaco-editor";
 
-  });
+  editorContainer.style.height = "100%";
 
-  localStorage.setItem(
+  editorContainer.style.width = "100%";
 
-    "ai_history",
+  document.querySelector(".editor").innerHTML = "";
 
-    JSON.stringify(
-      historyData
-    )
+  document.querySelector(".editor").appendChild(editorContainer);
 
-  );
+  // =========================
+  // MONACO EDITOR
+  // =========================
 
-  renderHistory();
+  editor = monaco.editor.create(editorContainer, {
 
-}
+    value: `<!DOCTYPE html>
+<html>
+<head>
+  <title>AI Dev Mentor</title>
+</head>
 
-/* =========================
-   RENDER HISTORY
-========================= */
+<body>
 
-function renderHistory(){
+  <h1>
+    Welcome To AI Dev Mentor 🚀
+  </h1>
 
-  const list =
-    document.getElementById(
-      "historyList"
-    );
+</body>
+</html>`,
 
-  if(!list) return;
+    language: "html",
 
-  list.innerHTML = "";
+    theme: "vs-dark",
 
-  historyData.forEach(item => {
+    fontSize: 16,
 
-    const div =
-      document.createElement("div");
+    automaticLayout: true,
 
-    div.className =
-      "history-item";
+    minimap: {
+      enabled: true
+    },
 
-    div.innerText =
-      item.title;
+    smoothScrolling: true,
 
-    div.onclick = () => {
-
-      streamHTML(
-        item.content
-      );
-
-    };
-
-    list.appendChild(div);
-
-  });
-
-}
-
-/* =========================
-   CLEAR HISTORY
-========================= */
-
-function clearHistory(){
-
-  localStorage.removeItem(
-    "ai_history"
-  );
-
-  historyData = [];
-
-  renderHistory();
-
-}
-
-/* =========================
-   COPY CODE
-========================= */
-
-function copyCode(id){
-
-  const text =
-    document.getElementById(id)
-    .innerText;
-
-  navigator.clipboard
-    .writeText(text);
-
-  alert("Copied");
-
-}
-
-/* =========================
-   STREAM HTML
-========================= */
-
-async function streamHTML(html){
-
-  const chat =
-    document.getElementById(
-      "chat"
-    );
-
-  const div =
-    document.createElement("div");
-
-  div.className =
-    "message";
-
-  chat.appendChild(div);
-
-  let i = 0;
-
-  const speed = 4;
-
-  function type(){
-
-    if(i < html.length){
-
-      div.innerHTML =
-        html.slice(0, i);
-
-      i += speed;
-
-      chat.scrollTop =
-        chat.scrollHeight;
-
-      requestAnimationFrame(type);
-
+    padding: {
+      top: 20
     }
 
-  }
+  });
 
-  type();
+});
+
+// =========================
+// TERMINAL
+// =========================
+
+const terminal = document.getElementById("terminal");
+
+function addTerminalLog(text){
+
+  const line = document.createElement("div");
+
+  line.innerText = text;
+
+  terminal.appendChild(line);
+
+  terminal.scrollTop = terminal.scrollHeight;
 
 }
 
-/* =========================
-   WORKFLOW SUGGESTIONS
-========================= */
+// =========================
+// GENERATE BUTTON
+// =========================
 
-function updateWorkflowSuggestions(
-  projectName
-){
+const generateBtn =
+document.getElementById("generateBtn");
 
-  const steps =
-    document.getElementById(
-      "workflowSteps"
-    );
+generateBtn.addEventListener("click", async ()=>{
 
-  if(!steps) return;
+  const prompt =
+  document.getElementById("promptInput").value;
 
-  if(!projectName){
+  if(!prompt){
 
-    steps.innerHTML =
-      "No suggestions yet";
+    alert("Enter your prompt");
 
     return;
 
   }
 
-  steps.innerHTML = `
+  // =========================
+  // TERMINAL LOGS
+  // =========================
 
-    <div class="file-item">
-      ✔ Add authentication
-    </div>
+  addTerminalLog("> Initializing AI Agent...");
 
-    <div class="file-item">
-      ✔ Improve architecture
-    </div>
+  addTerminalLog("> Understanding project architecture...");
 
-    <div class="file-item">
-      ✔ Add deployment
-    </div>
+  addTerminalLog("> Generating production code...");
 
-    <div class="file-item">
-      ✔ Add testing
-    </div>
+  // =========================
+  // DEMO AI OUTPUT
+  // =========================
 
-  `;
+  setTimeout(()=>{
 
-}
+    editor.setValue(`<!DOCTYPE html>
+<html>
+<head>
 
-/* =========================
-   LOAD ACTIVE PROJECT
-========================= */
+  <title>AI Generated App</title>
 
-async function loadActiveProject(){
+  <style>
 
-  try {
-
-    const res =
-      await fetch(
-        "/get-project-memory"
-      );
-
-    const data =
-      await res.json();
-
-    if(
-      data &&
-      data.projectName
-    ){
-
-      activeProject =
-        data;
-
-      document.getElementById(
-        "activeProjectName"
-      ).innerText =
-        data.projectName;
-
-      renderFileExplorer(
-        data.files || []
-      );
-
-      updateWorkflowSuggestions(
-        data.projectName
-      );
-
+    body{
+      background:#0f172a;
+      color:white;
+      font-family:sans-serif;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      height:100vh;
+      margin:0;
     }
 
-  } catch(err){
+    .card{
+      background:#1e293b;
+      padding:40px;
+      border-radius:20px;
+      text-align:center;
+    }
 
-    console.log(err);
+  </style>
 
-  }
+</head>
 
-}
+<body>
 
-/* =========================
-   RUN AI
-========================= */
+  <div class="card">
 
-async function runAI(){
+    <h1>
+      🚀 AI Generated Project
+    </h1>
 
-  const prompt =
-    document.getElementById(
-      "prompt"
-    ).value;
+    <p>
+      Prompt:
+      ${prompt}
+    </p>
 
-  const mode =
-    document.getElementById(
-      "mode"
-    ).value;
+  </div>
 
-  const language =
-    document.getElementById(
-      "language"
-    ).value;
+</body>
+</html>`);
 
-  streamHTML(`
+    addTerminalLog("> Project generated successfully.");
 
-    <div class="section-title">
-      🧠 AI Thinking...
-    </div>
+  },2000);
 
-  `);
-
-  /* =========================
-     ANALYZE
-  ========================= */
-
-  if(mode === "analyze"){
-
-    const res =
-      await fetch(
-        "/analyze",
-        {
-
-          method:"POST",
-
-          headers:{
-            "Content-Type":
-            "application/json"
-          },
-
-          body:JSON.stringify({
-
-            code:prompt,
-            language
-
-          })
-
-        }
-      );
-
-    const data =
-      await res.json();
-
-    const codeId =
-      "fix_" + Date.now();
-
-    const html = `
-
-      <div class="section">
-
-        <div class="section-title">
-          🐞 Problems
-        </div>
-
-        <pre>
-${(data.issues || []).join("\n\n")}
-        </pre>
-
-      </div>
-
-      <div class="section">
-
-        <div class="section-title">
-          ⚡ Fixes
-        </div>
-
-        <pre>
-${(data.fixes || []).join("\n\n")}
-        </pre>
-
-      </div>
-
-      <div class="section">
-
-        <div class="section-title">
-          📘 Explanation
-        </div>
-
-        <pre>
-${(data.explanation || []).join("\n\n")}
-        </pre>
-
-      </div>
-
-      <div class="section">
-
-        <div class="section-title">
-          💻 Fixed Code
-        </div>
-
-        <div class="code-box">
-
-          <div class="code-top">
-
-            <div>
-              ${language}
-            </div>
-
-            <button
-              class="copy-btn"
-              onclick="copyCode('${codeId}')"
-            >
-              Copy
-            </button>
-
-          </div>
-
-          <pre id="${codeId}">
-${data.fixedCode || ""}
-          </pre>
-
-        </div>
-
-      </div>
-
-    `;
-
-    streamHTML(html);
-
-    saveHistory(
-      "💻 Analysis",
-      html
-    );
-
-  }
-
-}
-
-/* =========================
-   INIT
-========================= */
-
-renderHistory();
-
-loadActiveProject();
+});
