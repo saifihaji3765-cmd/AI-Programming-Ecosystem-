@@ -1374,6 +1374,50 @@ app.post(
 
 );
 /* =========================
+   DEPLOY PROJECT
+========================= */
+
+app.post(
+
+  "/deploy-project",
+
+  async (req,res) => {
+
+    try {
+
+      /* =========================
+         FAKE DEPLOY URL
+      ========================= */
+
+      const projectId =
+        Date.now();
+
+      const url =
+
+`https://project-${projectId}.rehman-ai.dev`;
+
+      res.json({
+
+        success:true,
+        url
+
+      });
+
+    } catch(err){
+
+      res.status(500).json({
+
+        success:false,
+        error:err.message
+
+      });
+
+    }
+
+  }
+
+);
+/* =========================
    START SERVER
 ========================= */
 
