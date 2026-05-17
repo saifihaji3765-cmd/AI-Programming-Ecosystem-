@@ -478,3 +478,79 @@ body{
   }
 
 }
+/* =========================
+   FILE EXPLORER
+========================= */
+
+.file-explorer{
+  width:240px;
+  background:#0d0d0d;
+  border-right:1px solid rgba(255,255,255,0.06);
+  display:flex;
+  flex-direction:column;
+}
+
+/* =========================
+   EXPLORER HEADER
+========================= */
+
+.explorer-header{
+  height:58px;
+  border-bottom:1px solid rgba(255,255,255,0.06);
+  display:flex;
+  align-items:center;
+  padding:0 18px;
+  color:#888;
+  font-size:13px;
+  letter-spacing:1px;
+}
+
+/* =========================
+   FILE TREE
+========================= */
+
+.file-tree{
+  padding:14px;
+  overflow:auto;
+}
+
+/* =========================
+   FOLDER
+========================= */
+
+.folder{
+  margin-bottom:14px;
+  color:#aaa;
+  font-size:14px;
+}
+
+/* =========================
+   FILE
+========================= */
+
+.file{
+  padding:12px 14px;
+  border-radius:12px;
+  cursor:pointer;
+  margin-bottom:8px;
+  transition:0.25s;
+  color:#d4d4d4;
+  font-size:14px;
+}
+
+/* =========================
+   FILE HOVER
+========================= */
+
+.file:hover{
+  background:#171717;
+}
+
+/* =========================
+   ACTIVE FILE
+========================= */
+
+.active-file{
+  background:#7c3aed;
+  color:white;
+}
