@@ -471,3 +471,76 @@ function closeTab(fileName){
   );
 
 }
+// =========================
+// CREATE FILE
+// =========================
+
+function createNewFile(){
+
+  const fileName =
+  prompt(
+    "Enter file name"
+  );
+
+  if(!fileName){
+
+    return;
+
+  }
+
+  // =========================
+  // EXISTS
+  // =========================
+
+  if(files[fileName]){
+
+    alert(
+      "File already exists"
+    );
+
+    return;
+
+  }
+
+  // =========================
+  // CREATE FILE
+  // =========================
+
+  files[fileName] = "";
+
+  // =========================
+  // FILE TREE
+  // =========================
+
+  const fileTree =
+  document.getElementById(
+    "fileTree"
+  );
+
+  const file =
+  document.createElement("div");
+
+  file.className = "file";
+
+  file.innerText =
+  "📄 " + fileName;
+
+  file.onclick = () => {
+
+    openFile(fileName);
+
+  };
+
+  fileTree.appendChild(file);
+
+  // =========================
+  // TERMINAL
+  // =========================
+
+  addTerminalLog(
+`
+> Created ${fileName}
+`
+  );
+
+}
