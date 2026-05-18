@@ -757,3 +757,89 @@ function saveCurrentFile(){
   );
 
 }
+// =========================
+// LIVE PREVIEW
+// =========================
+
+function runPreview(){
+
+  // =========================
+  // HTML
+  // =========================
+
+  const html =
+  files["index.html"] || "";
+
+  // =========================
+  // CSS
+  // =========================
+
+  const css =
+  files["styles.css"] || "";
+
+  // =========================
+  // JS
+  // =========================
+
+  const js =
+  files["app.js"] || "";
+
+  // =========================
+  // FINAL APP
+  // =========================
+
+  const finalCode = `
+
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<style>
+
+${css}
+
+</style>
+
+</head>
+
+<body>
+
+${html}
+
+<script>
+
+${js}
+
+</script>
+
+</body>
+
+</html>
+
+`;
+
+  // =========================
+  // IFRAME
+  // =========================
+
+  const iframe =
+  document.getElementById(
+    "previewFrame"
+  );
+
+  iframe.srcdoc =
+  finalCode;
+
+  // =========================
+  // TERMINAL
+  // =========================
+
+  addTerminalLog(
+`
+> Live Preview Running
+`
+  );
+
+}
