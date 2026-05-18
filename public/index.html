@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <title>AI Dev Mentor</title>
 
@@ -34,7 +34,7 @@
           WORKSPACE
         </div>
 
-        <div class="nav-item active">
+        <div class="nav-item active-nav">
           🏠 Dashboard
         </div>
 
@@ -47,16 +47,16 @@
         </div>
 
         <div class="nav-item">
-          🌐 Deployments
+          🌍 Deployments
         </div>
 
         <div class="nav-item">
-          ⚙ Settings
+          ⚙️ Settings
         </div>
 
       </div>
 
-      <div class="nav-section">
+      <div class="nav-section second-nav">
 
         <div class="nav-title">
           AI SYSTEMS
@@ -83,247 +83,215 @@
     </aside>
 
     <!-- =========================
-         MAIN
+         MAIN WORKSPACE
     ========================== -->
 
-    <main class="main">
+    <main class="workspace">
 
       <!-- =========================
            TOPBAR
       ========================== -->
 
-      <div class="topbar">
+      <header class="topbar">
 
-        <div class="project-info">
-          <h2>
+        <div class="topbar-left">
+
+          <h1>
             Build Anything with AI
-          </h2>
+          </h1>
 
           <p>
-            AI-powered autonomous software engineering platform
+            AI-powered autonomous software engineering platform.
           </p>
+
         </div>
 
-        <div class="actions">
-<button
-  class="btn"
-  onclick="saveCurrentFile()"
->
-  💾 Save
-</button>
-          <button class="btn">
-            📁 Import
+        <div class="topbar-actions">
+
+          <button onclick="saveCurrentFile()">
+            💾 Save
           </button>
 
-          <button class="btn">
+          <button>
+            📦 Import
+          </button>
+
+          <button>
             🔄 Sync
           </button>
 
-          <button class="btn">
+          <button onclick="runPreview()">
             ⚡ Preview
           </button>
 
-          <button class="btn primary">
+          <button class="deploy-btn">
             🚀 Deploy
           </button>
 
         </div>
 
+      </header>
+
+      <!-- =========================
+           MAIN GRID
+      ========================== -->
+
+      <div class="workspace-grid">
+
+        <!-- =========================
+             AI CHAT PANEL
+        ========================== -->
+
+        <section class="chat-panel">
+
+          <div class="chat-header">
+            🤖 AI Workspace
+          </div>
+
+          <div class="chat-messages" id="chatMessages">
+
+            <div class="message ai-message">
+              <div class="message-role">
+                AI DEV MENTOR
+              </div>
+
+              <div class="message-content">
+                Welcome Rehman 🚀
+                <br /><br />
+                Describe what you want to build.
+                <br />
+                I will generate production-ready files,
+                UI, APIs and deployment structure.
+              </div>
+            </div>
+
+          </div>
+
+          <!-- =========================
+               PROMPT AREA
+          ========================== -->
+
+          <div class="chat-input-area">
+
+            <textarea
+              id="promptInput"
+              placeholder="Describe your app idea..."
+            ></textarea>
+
+            <button id="generateBtn">
+              Generate Project
+            </button>
+
+          </div>
+
+        </section>
+
+        <!-- =========================
+             IDE PANEL
+        ========================== -->
+
+        <section class="ide-panel">
+
+          <!-- =========================
+               EXPLORER
+          ========================== -->
+
+          <div class="explorer-panel">
+
+            <div class="explorer-header">
+              EXPLORER
+
+              <button onclick="createNewFile()">
+                +
+              </button>
+            </div>
+
+            <div id="fileTree" class="file-tree">
+
+              <div class="file" data-file="index.html" onclick="openFile('index.html')">
+                📄 index.html
+              </div>
+
+              <div class="file" data-file="styles.css" onclick="openFile('styles.css')">
+                📄 styles.css
+              </div>
+
+              <div class="file" data-file="app.js" onclick="openFile('app.js')">
+                📄 app.js
+              </div>
+
+              <div class="file" data-file="server.js" onclick="openFile('server.js')">
+                📄 server.js
+              </div>
+
+            </div>
+
+          </div>
+
+          <!-- =========================
+               EDITOR AREA
+          ========================== -->
+
+          <div class="editor-workspace">
+
+            <!-- TABS -->
+
+            <div class="tabs">
+
+              <div class="tab active" id="welcomeTab">
+                Welcome
+              </div>
+
+            </div>
+
+            <!-- EDITOR -->
+
+            <div class="editor"></div>
+
+          </div>
+
+        </section>
+
+        <!-- =========================
+             PREVIEW PANEL
+        ========================== -->
+
+        <section class="preview-panel">
+
+          <div class="preview-header">
+            ⚡ Live Preview
+          </div>
+
+          <iframe
+            id="previewFrame"
+            class="preview-frame"
+          ></iframe>
+
+        </section>
+
       </div>
 
       <!-- =========================
-           WORKSPACE
+           TERMINAL
       ========================== -->
 
-      <div class="workspace">
+      <div class="terminal-wrapper">
 
-      <!-- =========================
-     FILE EXPLORER
-========================= -->
+        <div class="terminal-header">
+          TERMINAL
+        </div>
 
-<div class="explorer-header">
+        <div id="terminal" class="terminal">
 
-  <span>
-    EXPLORER
-  </span>
-
-  <button
-    class="new-file-btn"
-    onclick="createNewFile()"
-  >
-    +
-  </button>
-
-</div>
-
-  <div class="file-tree" id="fileTree">
-
-    <div class="folder">
-
-      📁 src
-
-    </div>
-
-    <div
-      class="file active-file"
-      onclick="openFile('index.html')"
-    >
-      📄 index.html
-    </div>
-
-    <div
-      class="file"
-      onclick="openFile('styles.css')"
-    >
-      📄 styles.css
-    </div>
-
-    <div
-      class="file"
-      onclick="openFile('app.js')"
-    >
-      📄 app.js
-    </div>
-
-    <div
-      class="file"
-      onclick="openFile('server.js')"
-    >
-      📄 server.js
-    </div>
-
-  </div>
-
-</div>
-        <!-- =========================
-             EDITOR AREA
-        ========================== -->
-
-        <div class="editor-area">
-
-          <!-- =========================
-               TABS
-          ========================== -->
-
-          <div class="tabs">
-
-            <div
-  class="tab active"
-  id="welcomeTab"
->
-  Welcome
-</div>
-
-          <!-- =========================
-               EDITOR
-          ========================== -->
-
-          <div class="editor">
-
-            <!-- HERO -->
-
-            <div class="hero">
-
-              <div class="hero-badge">
-                ✨ Next Generation AI Software Engineer
-              </div>
-
-              <h1>
-                Build Production Apps<br/>
-                With One Prompt
-              </h1>
-
-              <p>
-                Create SaaS apps, AI agents, websites, mobile apps,
-                dashboards, APIs and complete startups using autonomous AI.
-              </p>
-
-            </div>
-
-            <!-- PROMPT CARD -->
-
-            <div class="prompt-card">
-
-              <textarea
-                class="prompt-input"
-                id="promptInput"
-                placeholder="Describe what you want to build..."
-              ></textarea>
-
-              <div class="prompt-actions">
-
-                <button class="btn primary" id="generateBtn">
-                  ⚡ Generate App
-                </button>
-
-                <button class="btn">
-                  🤖 AI Agent
-                </button>
-
-                <button class="btn">
-                  🌐 Full Stack
-                </button>
-
-                <button class="btn">
-                  📱 Mobile App
-                </button>
-
-              </div>
-
-            </div>
-
+          <div>
+            > AI Dev Mentor Initialized
           </div>
 
-          <!-- =========================
-               TERMINAL
-          ========================== -->
-
-          <div class="terminal" id="terminal">
-
-            > AI Dev Mentor Terminal Ready...
-
+          <div>
+            > Waiting for prompt...
           </div>
 
         </div>
-
-        <!-- =========================
-             AI PANEL
-        ========================== -->
-
-        <aside class="ai-panel">
-
-          <div class="ai-header">
-
-            <h3>
-              🤖 AI Assistant
-            </h3>
-
-            <p>
-              Autonomous engineering system
-            </p>
-
-          </div>
-
-          <div class="chat-area">
-
-            <div class="message">
-              Welcome to AI Dev Mentor.<br/><br/>
-
-              Your AI system can:
-              <br/><br/>
-
-              • Generate apps<br/>
-              • Create backend systems<br/>
-              • Build APIs<br/>
-              • Deploy websites<br/>
-              • Create databases<br/>
-              • Build AI agents<br/>
-              • Generate production code
-            </div>
-
-          </div>
-
-        </aside>
 
       </div>
 
@@ -331,9 +299,8 @@
 
   </div>
 
-  <!-- JS -->
+  <!-- APP JS -->
   <script src="/app.js"></script>
 
 </body>
-
 </html>
