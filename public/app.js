@@ -162,6 +162,66 @@ const generateBtn =
 document.getElementById(
   "generateBtn"
 );
+// =========================
+// CHAT SYSTEM
+// =========================
+
+const chatMessages =
+document.getElementById(
+  "chatMessages"
+);
+
+// =========================
+// ADD MESSAGE
+// =========================
+
+function addChatMessage(
+  role,
+  text
+){
+
+  const message =
+  document.createElement("div");
+
+  message.className =
+  `message ${
+    role === "ai"
+    ? "ai-message"
+    : "user-message"
+  }`;
+
+  message.innerHTML = `
+
+    <div class="message-role">
+
+      ${
+        role === "ai"
+        ? "AI DEV MENTOR"
+        : "YOU"
+      }
+
+    </div>
+
+    <div class="message-content">
+
+      ${text}
+
+    </div>
+
+  `;
+
+  chatMessages.appendChild(
+    message
+  );
+
+  // =========================
+  // AUTO SCROLL
+  // =========================
+
+  chatMessages.scrollTop =
+  chatMessages.scrollHeight;
+
+}
 
 // =========================
 // AI GENERATION
@@ -177,7 +237,14 @@ generateBtn.addEventListener(
     ).value;
 
     if(!prompt){
+// =========================
+// USER MESSAGE
+// =========================
 
+addChatMessage(
+  "user",
+  prompt
+);
       alert(
         "Enter your prompt"
       );
@@ -349,7 +416,14 @@ generateBtn.addEventListener(
       );
 
     }
+// =========================
+// AI SUCCESS
+// =========================
 
+addChatMessage(
+  "ai",
+  "✅ Project generated successfully.\nFiles, UI and preview are ready."
+);
     catch(error){
 
       console.log(error);
