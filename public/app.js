@@ -3,190 +3,19 @@
 // =========================
 
 let editor;
+
 // =========================
 // OPEN TABS
 // =========================
 
 let openTabs = [];
+
 // =========================
 // CURRENT FILE
 // =========================
 
 let currentFile = null;
-require.config({
-  paths: {
-    vs: "https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs"
-  }
-});
 
-require(["vs/editor/editor.main"], function () {
-
-  // =========================
-  // CREATE EDITOR CONTAINER
-  // =========================
-
-  const editorContainer = document.createElement("div");
-
-  editorContainer.id = "monaco-editor";
-
-  editorContainer.style.height = "100%";
-
-  editorContainer.style.width = "100%";
-
-  document.querySelector(".editor").innerHTML = "";
-
-  document.querySelector(".editor").appendChild(editorContainer);
-
-  // =========================
-  // MONACO EDITOR
-  // =========================
-
-  editor = monaco.editor.create(editorContainer, {
-
-    value: `<!DOCTYPE html>
-<html>
-<head>
-  <title>AI Dev Mentor</title>
-</head>
-
-<body>
-
-  <h1>
-    Welcome To AI Dev Mentor 🚀
-  </h1>
-
-</body>
-</html>`,
-
-    language: "html",
-
-    theme: "vs-dark",
-
-    fontSize: 16,
-
-    automaticLayout: true,
-
-    minimap: {
-      enabled: true
-    },
-
-    smoothScrolling: true,
-
-    padding: {
-      top: 20
-    }
-
-  });
-
-});
-
-// =========================
-// TERMINAL
-// =========================
-
-const terminal = document.getElementById("terminal");
-
-function addTerminalLog(text){
-
-  const line = document.createElement("div");
-
-  line.innerText = text;
-
-  terminal.appendChild(line);
-
-  terminal.scrollTop = terminal.scrollHeight;
-
-}
-
-// =========================
-// GENERATE BUTTON
-// =========================
-
-const generateBtn =
-document.getElementById("generateBtn");
-
-generateBtn.addEventListener("click", async ()=>{
-
-  const prompt =
-  document.getElementById("promptInput").value;
-
-  if(!prompt){
-
-    alert("Enter your prompt");
-
-    return;
-
-  }
-
-  // =========================
-  // TERMINAL LOGS
-  // =========================
-
-  addTerminalLog("> Initializing AI Agent...");
-
-  addTerminalLog("> Understanding project architecture...");
-
-  addTerminalLog("> Generating production code...");
-
-  // =========================
-  // DEMO AI OUTPUT
-  // =========================
-
-  setTimeout(()=>{
-
-    editor.setValue(`<!DOCTYPE html>
-<html>
-<head>
-
-  <title>AI Generated App</title>
-
-  <style>
-
-    body{
-      background:#0f172a;
-      color:white;
-      font-family:sans-serif;
-      display:flex;
-      justify-content:center;
-      align-items:center;
-      height:100vh;
-      margin:0;
-    }
-
-    .card{
-      background:#1e293b;
-      padding:40px;
-      border-radius:20px;
-      text-align:center;
-    }
-
-  </style>
-
-</head>
-
-<body>
-
-  <div class="card">
-
-    <h1>
-      🚀 AI Generated Project
-    </h1>
-
-    <p>
-      Prompt:
-      ${prompt}
-    </p>
-
-  </div>
-
-</body>
-</html>`);
-
-    addTerminalLog("> Project generated successfully.");
-
-  },2000);
-
-});
 // =========================
 // FILE SYSTEM
 // =========================
@@ -219,9 +48,321 @@ const files = {
 `console.log("AI Dev Mentor");`,
 
   "server.js":
-`const express = require("express");`
+`import express from "express";`,
+
+  "package.json":
+`{
+  "name":"ai-app",
+  "version":"1.0.0"
+}`,
+
+  "README.md":
+`# AI Generated Project`
 
 };
+
+// =========================
+// MONACO CONFIG
+// =========================
+
+require.config({
+  paths: {
+    vs: "https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs"
+  }
+});
+
+// =========================
+// INIT EDITOR
+// =========================
+
+require(["vs/editor/editor.main"], function () {
+
+  const editorContainer =
+  document.createElement("div");
+
+  editorContainer.id =
+  "monaco-editor";
+
+  editorContainer.style.height =
+  "100%";
+
+  editorContainer.style.width =
+  "100%";
+
+  document.querySelector(
+    ".editor"
+  ).innerHTML = "";
+
+  document.querySelector(
+    ".editor"
+  ).appendChild(editorContainer);
+
+  // =========================
+  // CREATE EDITOR
+  // =========================
+
+  editor = monaco.editor.create(
+    editorContainer,
+    {
+
+      value:
+      files["index.html"],
+
+      language:"html",
+
+      theme:"vs-dark",
+
+      fontSize:16,
+
+      automaticLayout:true,
+
+      minimap:{
+        enabled:true
+      },
+
+      smoothScrolling:true,
+
+      padding:{
+        top:20
+      }
+
+    }
+  );
+
+});
+
+// =========================
+// TERMINAL
+// =========================
+
+const terminal =
+document.getElementById(
+  "terminal"
+);
+
+function addTerminalLog(text){
+
+  const line =
+  document.createElement("div");
+
+  line.innerText = text;
+
+  terminal.appendChild(line);
+
+  terminal.scrollTop =
+  terminal.scrollHeight;
+
+}
+
+// =========================
+// GENERATE BUTTON
+// =========================
+
+const generateBtn =
+document.getElementById(
+  "generateBtn"
+);
+
+// =========================
+// AI GENERATION
+// =========================
+
+generateBtn.addEventListener(
+  "click",
+  async ()=>{
+
+    const prompt =
+    document.getElementById(
+      "promptInput"
+    ).value;
+
+    if(!prompt){
+
+      alert(
+        "Enter your prompt"
+      );
+
+      return;
+
+    }
+
+    // =========================
+    // TERMINAL
+    // =========================
+
+    addTerminalLog(
+`
+> Initializing AI Agent...
+`
+    );
+
+    addTerminalLog(
+`
+> Connecting to OpenAI...
+`
+    );
+
+    addTerminalLog(
+`
+> Generating project files...
+`
+    );
+
+    try{
+
+      // =========================
+      // API
+      // =========================
+
+      const response =
+      await fetch(
+        "/api/ai",
+        {
+
+          method:"POST",
+
+          headers:{
+            "Content-Type":
+            "application/json"
+          },
+
+          body:JSON.stringify({
+            prompt
+          })
+
+        }
+      );
+
+      const data =
+      await response.json();
+
+      // =========================
+      // ERROR
+      // =========================
+
+      if(!data.success){
+
+        addTerminalLog(
+`
+> AI Error
+`
+        );
+
+        console.log(data);
+
+        return;
+
+      }
+
+      // =========================
+      // PARSE JSON
+      // =========================
+
+      const aiData =
+      JSON.parse(data.reply);
+
+      // =========================
+      // FILES
+      // =========================
+
+      if(aiData.files){
+
+        aiData.files.forEach(file=>{
+
+          // SAVE FILE
+
+          files[file.name] =
+          file.content;
+
+          // =========================
+          // EXISTS
+          // =========================
+
+          const exists =
+          document.querySelector(
+`
+[data-file="${file.name}"]
+`
+          );
+
+          // =========================
+          // CREATE FILE UI
+          // =========================
+
+          if(!exists){
+
+            const fileTree =
+            document.getElementById(
+              "fileTree"
+            );
+
+            const fileElement =
+            document.createElement(
+              "div"
+            );
+
+            fileElement.className =
+            "file";
+
+            fileElement.setAttribute(
+              "data-file",
+              file.name
+            );
+
+            fileElement.innerText =
+            "📄 " + file.name;
+
+            fileElement.onclick = ()=>{
+
+              openFile(
+                file.name
+              );
+
+            };
+
+            fileTree.appendChild(
+              fileElement
+            );
+
+          }
+
+        });
+
+        // =========================
+        // OPEN FIRST FILE
+        // =========================
+
+        openFile(
+          aiData.files[0].name
+        );
+
+      }
+
+      // =========================
+      // TERMINAL
+      // =========================
+
+      addTerminalLog(
+`
+> AI Generation Complete
+`
+      );
+
+    }
+
+    catch(error){
+
+      console.log(error);
+
+      addTerminalLog(
+`
+> Server Error
+`
+      );
+
+    }
+
+});
 
 // =========================
 // OPEN FILE
@@ -242,10 +383,6 @@ function openFile(fileName){
     );
 
   });
-
-  event.target.classList.add(
-    "active-file"
-  );
 
   // =========================
   // CREATE TAB
@@ -300,12 +437,13 @@ function createTab(fileName){
 
   tab.className = "tab";
 
-  tab.id = "tab-" + fileName;
+  tab.id =
+  "tab-" + fileName;
 
   tab.innerHTML = `
-  
+
     ${fileName}
-    
+
     <span
       onclick="
         closeTab(
@@ -322,7 +460,7 @@ function createTab(fileName){
 
   `;
 
-  tab.onclick = () => {
+  tab.onclick = ()=>{
 
     activateTab(fileName);
 
@@ -337,14 +475,12 @@ function createTab(fileName){
 // =========================
 
 function activateTab(fileName){
-// =========================
-// CURRENT FILE
-// =========================
 
-currentFile = fileName;
-  editor.setValue(
-  files[fileName]
-);
+  // =========================
+  // CURRENT FILE
+  // =========================
+
+  currentFile = fileName;
 
   // =========================
   // REMOVE ACTIVE
@@ -381,14 +517,25 @@ currentFile = fileName;
   // DETECT LANGUAGE
   // =========================
 
-  let language = "javascript";
+  let language =
+  "javascript";
 
-  if(fileName.endsWith(".html")){
+  if(
+    fileName.endsWith(".html")
+  ){
     language = "html";
   }
 
-  if(fileName.endsWith(".css")){
+  if(
+    fileName.endsWith(".css")
+  ){
     language = "css";
+  }
+
+  if(
+    fileName.endsWith(".json")
+  ){
+    language = "json";
   }
 
   // =========================
@@ -484,6 +631,7 @@ function closeTab(fileName){
   );
 
 }
+
 // =========================
 // CREATE FILE
 // =========================
@@ -535,10 +683,15 @@ function createNewFile(){
 
   file.className = "file";
 
+  file.setAttribute(
+    "data-file",
+    fileName
+  );
+
   file.innerText =
   "📄 " + fileName;
 
-  file.onclick = () => {
+  file.onclick = ()=>{
 
     openFile(fileName);
 
@@ -557,6 +710,7 @@ function createNewFile(){
   );
 
 }
+
 // =========================
 // SAVE FILE
 // =========================
