@@ -1,59 +1,52 @@
-/* =========================
-   IMPORTS
-========================= */
-const { spawn } =
-  require("child_process");
-const multer =
-  require("multer");
+// =========================
+// IMPORTS
+// =========================
 
 require("dotenv").config();
 
 const express =
-  require("express");
+require("express");
 
 const cors =
-  require("cors");
+require("cors");
 
 const fs =
-  require("fs");
+require("fs");
 
 const path =
-  require("path");
+require("path");
 
 const bodyParser =
-  require("body-parser");
-
-const { exec } =
-  require("child_process");
+require("body-parser");
 
 const OpenAI =
-  require("openai");
+require("openai");
 
-/* =========================
-   OPENAI
-========================= */
+// =========================
+// OPENAI
+// =========================
 
 const openai =
-  new OpenAI({
+new OpenAI({
 
-    apiKey:
-      process.env.OPENAI_API_KEY
+  apiKey:
+  process.env.OPENAI_API_KEY
 
-  });
+});
 
-/* =========================
-   APP
-========================= */
+// =========================
+// EXPRESS
+// =========================
 
 const app =
-  express();
+express();
 
 const PORT =
-  3000;
+3000;
 
-/* =========================
-   MIDDLEWARE
-========================= */
+// =========================
+// MIDDLEWARE
+// =========================
 
 app.use(cors());
 
@@ -62,6 +55,10 @@ app.use(
     limit:"50mb"
   })
 );
+
+// =========================
+// PUBLIC FOLDER
+// =========================
 
 app.use(
   express.static(
@@ -72,15 +69,15 @@ app.use(
   )
 );
 
-/* =========================
-   WORKSPACE
-========================= */
+// =========================
+// WORKSPACE
+// =========================
 
 const WORKSPACE =
-  path.join(
-    __dirname,
-    "workspace"
-  );
+path.join(
+  __dirname,
+  "workspace"
+);
 
 if(
   !fs.existsSync(
@@ -93,77 +90,36 @@ if(
   );
 
 }
-/* =========================
-   MULTER STORAGE
-========================= */
 
-const storage =
-  multer.diskStorage({
-
-    destination:
-      function(
-        req,
-        file,
-        cb
-      ){
-
-        cb(
-          null,
-          WORKSPACE
-        );
-
-      },
-
-    filename:
-      function(
-        req,
-        file,
-        cb
-      ){
-
-        cb(
-          null,
-          file.originalname
-        );
-
-      }
-
-  });
-
-const upload =
-  multer({
-    storage
-  });
-
-/* =========================
-   ACTIVE PROJECT
-========================= */
+// =========================
+// PROJECT MEMORY
+// =========================
 
 let activeProject = {
 
   projectName:
-    "AI Workspace",
+  "AI Workspace",
 
   files:[]
 
 };
 
-/* =========================
-   AGENT LOGS
-========================= */
+// =========================
+// AGENT LOGS
+// =========================
 
 let agentLogs = "";
 
-/* =========================
-   LOAD WORKSPACE FILES
-========================= */
+// =========================
+// LOAD FILES
+// =========================
 
 function loadWorkspaceFiles(){
 
   function readDir(dir){
 
     const items =
-      fs.readdirSync(dir);
+    fs.readdirSync(dir);
 
     let results = [];
 
@@ -173,59 +129,64 @@ function loadWorkspaceFiles(){
     ){
 
       const itemPath =
-        path.join(
-          dir,
-          item
-        );
+      path.join(
+        dir,
+        item
+      );
 
       const stat =
-        fs.statSync(
-          itemPath
-        );
+      fs.statSync(
+        itemPath
+      );
 
       const relative =
-        path.relative(
-          WORKSPACE,
-          itemPath
-        );
+      path.relative(
+        WORKSPACE,
+        itemPath
+      );
 
-      /* =========================
-         FOLDER
-      ========================= */
+      // =========================
+      // FOLDER
+      // =========================
 
-      if(stat.isDirectory()){
+      if(
+        stat.isDirectory()
+      ){
 
         results.push({
 
           name:relative,
+
           type:"folder",
+
           content:""
 
         });
 
         results =
-          results.concat(
-            readDir(itemPath)
-          );
+        results.concat(
+          readDir(itemPath)
+        );
 
       }
 
-      /* =========================
-         FILE
-      ========================= */
+      // =========================
+      // FILE
+      // =========================
 
       else {
 
         results.push({
 
           name:relative,
+
           type:"file",
 
           content:
-            fs.readFileSync(
-              itemPath,
-              "utf-8"
-            )
+          fs.readFileSync(
+            itemPath,
+            "utf-8"
+          )
 
         });
 
@@ -238,21 +199,21 @@ function loadWorkspaceFiles(){
   }
 
   activeProject.files =
-    readDir(WORKSPACE);
+  readDir(WORKSPACE);
 
 }
 
 loadWorkspaceFiles();
 
-/* =========================
-   GET PROJECT MEMORY
-========================= */
+// =========================
+// GET PROJECT
+// =========================
 
 app.get(
 
   "/get-project-memory",
 
-  (req,res) => {
+  (req,res)=>{
 
     loadWorkspaceFiles();
 
@@ -264,17 +225,17 @@ app.get(
 
 );
 
-/* =========================
-   SAVE FILE
-========================= */
+// =========================
+// SAVE FILE
+// =========================
 
 app.post(
 
   "/save-file",
 
-  (req,res) => {
+  (req,res)=>{
 
-    try {
+    try{
 
       const {
         fileName,
@@ -282,20 +243,18 @@ app.post(
       } = req.body;
 
       const filePath =
-        path.join(
-          WORKSPACE,
-          fileName
-        );
+      path.join(
+        WORKSPACE,
+        fileName
+      );
 
       const dir =
-        path.dirname(
-          filePath
-        );
+      path.dirname(
+        filePath
+      );
 
       if(
-        !fs.existsSync(
-          dir
-        )
+        !fs.existsSync(dir)
       ){
 
         fs.mkdirSync(
@@ -320,11 +279,14 @@ app.post(
 
       });
 
-    } catch(err){
+    }
+
+    catch(err){
 
       res.status(500).json({
 
         success:false,
+
         error:err.message
 
       });
@@ -335,37 +297,35 @@ app.post(
 
 );
 
-/* =========================
-   CREATE FILE
-========================= */
+// =========================
+// CREATE FILE
+// =========================
 
 app.post(
 
   "/create-file",
 
-  (req,res) => {
+  (req,res)=>{
 
-    try {
+    try{
 
       const {
         name
       } = req.body;
 
       const filePath =
-        path.join(
-          WORKSPACE,
-          name
-        );
+      path.join(
+        WORKSPACE,
+        name
+      );
 
       const dir =
-        path.dirname(
-          filePath
-        );
+      path.dirname(
+        filePath
+      );
 
       if(
-        !fs.existsSync(
-          dir
-        )
+        !fs.existsSync(dir)
       ){
 
         fs.mkdirSync(
@@ -390,7 +350,9 @@ app.post(
 
       });
 
-    } catch(err){
+    }
+
+    catch(err){
 
       res.status(500).json({
 
@@ -404,428 +366,76 @@ app.post(
 
 );
 
-/* =========================
-   CREATE FOLDER
-========================= */
+// =========================
+// AI GENERATION
+// =========================
 
 app.post(
 
-  "/create-folder",
+  "/api/ai",
 
-  (req,res) => {
+  async (req,res)=>{
 
-    try {
-
-      const {
-        name
-      } = req.body;
-
-      const folderPath =
-        path.join(
-          WORKSPACE,
-          name
-        );
-
-      if(
-        !fs.existsSync(
-          folderPath
-        )
-      ){
-
-        fs.mkdirSync(
-          folderPath,
-          {
-            recursive:true
-          }
-        );
-
-      }
-
-      loadWorkspaceFiles();
-
-      res.json({
-
-        success:true
-
-      });
-
-    } catch(err){
-
-      res.status(500).json({
-
-        success:false
-
-      });
-
-    }
-
-  }
-
-);
-
-/* =========================
-   DELETE FILE
-========================= */
-
-app.post(
-
-  "/delete-file",
-
-  (req,res) => {
-
-    try {
-
-      const {
-        name
-      } = req.body;
-
-      const filePath =
-        path.join(
-          WORKSPACE,
-          name
-        );
-
-      if(
-        fs.existsSync(
-          filePath
-        )
-      ){
-
-        const stat =
-          fs.statSync(
-            filePath
-          );
-
-        if(
-          stat.isDirectory()
-        ){
-
-          fs.rmSync(
-            filePath,
-            {
-              recursive:true,
-              force:true
-            }
-          );
-
-        } else {
-
-          fs.unlinkSync(
-            filePath
-          );
-
-        }
-
-      }
-
-      loadWorkspaceFiles();
-
-      res.json({
-
-        success:true
-
-      });
-
-    } catch(err){
-
-      res.status(500).json({
-
-        success:false
-
-      });
-
-    }
-
-  }
-
-);
-
-/* =========================
-   RENAME FILE
-========================= */
-
-app.post(
-
-  "/rename-file",
-
-  (req,res) => {
-
-    try {
-
-      const {
-        oldName,
-        newName
-      } = req.body;
-
-      const oldPath =
-        path.join(
-          WORKSPACE,
-          oldName
-        );
-
-      const newPath =
-        path.join(
-          WORKSPACE,
-          newName
-        );
-
-      fs.renameSync(
-        oldPath,
-        newPath
-      );
-
-      loadWorkspaceFiles();
-
-      res.json({
-
-        success:true
-
-      });
-
-    } catch(err){
-
-      res.status(500).json({
-
-        success:false
-
-      });
-
-    }
-
-  }
-
-);
-
-/* =========================
-   TERMINAL
-========================= */
-
-let terminalLogs = "";
-
-app.post(
-
-  "/terminal",
-
-  (req,res) => {
-
-    const {
-      command
-    } = req.body;
-
-    exec(
-
-      command,
-
-      {
-        cwd:WORKSPACE
-      },
-
-      (
-        error,
-        stdout,
-        stderr
-      ) => {
-
-        const output =
-          stdout || stderr;
-
-        terminalLogs += `
-${output}
-`;
-
-        res.json({
-
-          output
-
-        });
-
-      }
-
-    );
-
-  }
-
-);
-
-/* =========================
-   TERMINAL STREAM
-========================= */
-
-app.get(
-
-  "/terminal-stream",
-
-  (req,res) => {
-
-    res.json({
-
-      output:
-        terminalLogs
-
-    });
-
-    terminalLogs = "";
-
-  }
-
-);
-
-/* =========================
-   OPENAI ANALYZE
-========================= */
-
-app.post(
-
-  "/analyze",
-
-  async (req,res) => {
-
-    try {
-
-      const {
-        code,
-        language
-      } = req.body;
-
-      const completion =
-        await openai.chat.completions.create({
-
-          model:
-            "gpt-4.1-mini",
-
-          messages:[
-
-            {
-
-              role:"system",
-
-              content:`
-
-You are an elite senior software engineer.
-
-Analyze code professionally.
-
-Return ONLY valid JSON.
-
-Required JSON format:
-
-{
-  "issues": [],
-  "fixes": [],
-  "explanation": [],
-  "fixedCode": ""
-}
-
-              `
-
-            },
-
-            {
-
-              role:"user",
-
-              content:`
-
-Language:
-${language}
-
-Code:
-${code}
-
-              `
-
-            }
-
-          ],
-
-          temperature:0.3
-
-        });
-
-      const text =
-        completion
-        .choices[0]
-        .message
-        .content;
-
-      const cleaned =
-        text
-        .replace(/```json/g,"")
-        .replace(/```/g,"")
-        .trim();
-
-      const parsed =
-        JSON.parse(
-          cleaned
-        );
-
-      res.json(parsed);
-
-    } catch(err){
-
-      console.log(err);
-
-      res.status(500).json({
-
-        issues:[
-          "AI analysis failed"
-        ],
-
-        fixes:[
-          "Check OpenAI API"
-        ],
-
-        explanation:[
-          err.message
-        ],
-
-        fixedCode:""
-
-      });
-
-    }
-
-  }
-
-);
-
-/* =========================
-   AUTONOMOUS AGENT
-========================= */
-
-app.post(
-
-  "/autonomous-agent",
-
-  async (req,res) => {
-
-    try {
+    try{
 
       const {
         prompt
       } = req.body;
 
       agentLogs = `
-🤖 Agent Started...
+🤖 AI Started...
 `;
 
+      // =========================
+      // LOAD FILES
+      // =========================
+
+      loadWorkspaceFiles();
+
+      const projectFiles =
+      activeProject.files
+      .filter(
+        file =>
+        file.type === "file"
+      )
+      .map(file => ({
+
+        name:file.name,
+
+        content:file.content
+
+      }));
+
+      // =========================
+      // OPENAI
+      // =========================
+
       const completion =
-        await openai.chat.completions.create({
+      await openai.chat.completions.create({
 
-          model:
-            "gpt-4.1-mini",
+        model:
+        "gpt-4.1-mini",
 
-          messages:[
+        messages:[
 
-            {
+          {
 
-              role:"system",
+            role:"system",
 
-              content:`
+            content:`
 
-You are an autonomous AI software engineer.
+You are a world class autonomous AI software engineer.
 
-Generate a professional project structure.
+Your job:
+
+1. Understand bad prompts
+2. Convert them into professional architecture
+3. Generate production-ready projects
+4. Create scalable UI/UX
+5. Fix bugs automatically
+6. Generate complete files
+
+IMPORTANT:
 
 Return ONLY valid JSON.
 
@@ -833,6 +443,7 @@ Format:
 
 {
   "projectName":"",
+  "summary":"",
   "files":[
     {
       "name":"",
@@ -841,48 +452,68 @@ Format:
   ]
 }
 
-              `
+Rules:
 
-            },
+- No markdown
+- No explanations
+- No triple backticks
+- Always complete code
+- Always production ready
 
-            {
+            `
 
-              role:"user",
+          },
 
-              content:prompt
+          {
 
-            }
+            role:"user",
 
-          ],
+            content:`
 
-          temperature:0.4
+USER IDEA:
 
-        });
+${prompt}
 
-      agentLogs += `
-🧠 AI planning completed...
-`;
+CURRENT PROJECT:
+
+${JSON.stringify(
+  projectFiles
+)}
+
+            `
+
+          }
+
+        ],
+
+        temperature:0.4
+
+      });
+
+      // =========================
+      // AI RESPONSE
+      // =========================
 
       const text =
-        completion
-        .choices[0]
-        .message
-        .content;
+      completion
+      .choices[0]
+      .message
+      .content;
 
       const cleaned =
-        text
-        .replace(/```json/g,"")
-        .replace(/```/g,"")
-        .trim();
+      text
+      .replace(/```json/g,"")
+      .replace(/```/g,"")
+      .trim();
 
       const parsed =
-        JSON.parse(
-          cleaned
-        );
+      JSON.parse(
+        cleaned
+      );
 
-      /* =========================
-         SAVE FILES
-      ========================= */
+      // =========================
+      // SAVE FILES
+      // =========================
 
       for(
         const file
@@ -890,20 +521,18 @@ Format:
       ){
 
         const filePath =
-          path.join(
-            WORKSPACE,
-            file.name
-          );
+        path.join(
+          WORKSPACE,
+          file.name
+        );
 
         const dir =
-          path.dirname(
-            filePath
-          );
+        path.dirname(
+          filePath
+        );
 
         if(
-          !fs.existsSync(
-            dir
-          )
+          !fs.existsSync(dir)
         ){
 
           fs.mkdirSync(
@@ -923,48 +552,38 @@ Format:
 
         );
 
-        agentLogs += `
-✔ Created:
-${file.name}
-`;
-
       }
-
-      activeProject.projectName =
-        parsed.projectName;
 
       loadWorkspaceFiles();
 
-      agentLogs += `
-🚀 Project Ready
+      agentLogs = `
+🚀 AI Build Complete
 `;
+
+      // =========================
+      // RESPONSE
+      // =========================
 
       res.json({
 
         success:true,
 
-        summary:
-`
-Project:
-${parsed.projectName}
-
-Files Generated:
-${parsed.files.length}
-`
+        reply:JSON.stringify(
+          parsed
+        )
 
       });
 
-    } catch(err){
+    }
+
+    catch(err){
 
       console.log(err);
-
-      agentLogs += `
-❌ Agent Failed
-`;
 
       res.status(500).json({
 
         success:false,
+
         error:err.message
 
       });
@@ -975,15 +594,15 @@ ${parsed.files.length}
 
 );
 
-/* =========================
-   AGENT STATUS
-========================= */
+// =========================
+// AGENT STATUS
+// =========================
 
 app.get(
 
   "/agent-status",
 
-  (req,res) => {
+  (req,res)=>{
 
     res.json({
 
@@ -995,22 +614,24 @@ app.get(
 
 );
 
-/* =========================
-   ROOT
-========================= */
+// =========================
+// ROOT
+// =========================
 
 app.get(
 
   "/",
 
-  (req,res) => {
+  (req,res)=>{
 
     res.sendFile(
 
       path.join(
 
         __dirname,
+
         "public",
+
         "index.html"
 
       )
@@ -1020,429 +641,25 @@ app.get(
   }
 
 );
-/* =========================
-   AI SELF EDIT PROJECT
-========================= */
 
-app.post(
-
-  "/ai-edit-project",
-
-  async (req,res) => {
-
-    try {
-
-      const {
-        prompt
-      } = req.body;
-
-      agentLogs = `
-🤖 AI Editing Started...
-`;
-
-      /* =========================
-         LOAD WORKSPACE FILES
-      ========================= */
-
-      loadWorkspaceFiles();
-
-      const projectFiles =
-        activeProject.files
-        .filter(
-          file =>
-            file.type === "file"
-        )
-        .map(file => ({
-
-          name:file.name,
-          content:file.content
-
-        }));
-
-      agentLogs += `
-📂 Workspace scanned...
-`;
-
-      /* =========================
-         OPENAI
-      ========================= */
-
-      const completion =
-        await openai.chat.completions.create({
-
-          model:
-            "gpt-4.1-mini",
-
-          messages:[
-
-            {
-
-              role:"system",
-
-              content:`
-
-You are an elite autonomous AI software engineer.
-
-Your task:
-Generate COMPLETE production-ready projects.
-
-IMPORTANT:
-
-Always respond ONLY in valid JSON format.
-
-Format:
-
-{
-  "files":[
-    {
-      "name":"index.html",
-      "content":"FULL CODE HERE"
-    }
-  ]
-}
-
-Rules:
-
-- Always generate multiple files
-- Never explain anything
-- Never add markdown
-- Never use triple backticks
-- Always return raw JSON only
-- Generate clean scalable code
-- Generate real project structures
-
-              `
-
-            },
-
-            {
-
-              role:"user",
-
-              content:`
-
-TASK:
-${prompt}
-
-PROJECT FILES:
-${JSON.stringify(projectFiles)}
-
-              `
-
-            }
-
-          ],
-
-          temperature:0.3
-
-        });
-
-      agentLogs += `
-🧠 AI generated edits...
-`;
-
-      const text =
-        completion
-        .choices[0]
-        .message
-        .content;
-
-      const cleaned =
-        text
-        .replace(/```json/g,"")
-        .replace(/```/g,"")
-        .trim();
-
-      const parsed =
-        JSON.parse(cleaned);
-
-      /* =========================
-         SAVE UPDATED FILES
-      ========================= */
-
-      for(
-        const file
-        of parsed.files
-      ){
-
-        const filePath =
-          path.join(
-            WORKSPACE,
-            file.name
-          );
-
-        const dir =
-          path.dirname(
-            filePath
-          );
-
-        if(
-          !fs.existsSync(
-            dir
-          )
-        ){
-
-          fs.mkdirSync(
-            dir,
-            {
-              recursive:true
-            }
-          );
-
-        }
-
-        fs.writeFileSync(
-
-          filePath,
-
-          file.content || ""
-
-        );
-
-        agentLogs += `
-✔ Updated:
-${file.name}
-`;
-
-      }
-
-      loadWorkspaceFiles();
-
-      agentLogs += `
-🚀 Project Updated
-`;
-
-      res.json({
-
-        success:true,
-
-        summary:
-          parsed.summary
-
-      });
-
-    } catch(err){
-
-      console.log(err);
-
-      agentLogs += `
-❌ AI Edit Failed
-`;
-
-      res.status(500).json({
-
-        success:false,
-        error:err.message
-
-      });
-
-    }
-
-  }
-
-);
-/* =========================
-   FILE UPLOAD
-========================= */
-
-app.post(
-
-  "/upload",
-
-  upload.single(
-    "file"
-  ),
-
-  (req,res) => {
-
-    try {
-
-      loadWorkspaceFiles();
-
-      res.json({
-
-        success:true,
-        file:req.file
-
-      });
-
-    } catch(err){
-
-      res.status(500).json({
-
-        success:false
-
-      });
-
-    }
-
-  }
-
-);
-/* =========================
-   LIVE PREVIEW
-========================= */
-
-let previewProcess = null;
-
-app.post(
-
-  "/start-preview",
-
-  async (req,res) => {
-
-    try {
-
-      /* =========================
-         STOP OLD PREVIEW
-      ========================= */
-
-      if(previewProcess){
-
-        previewProcess.kill();
-
-      }
-
-      /* =========================
-         START SIMPLE SERVER
-      ========================= */
-
-      previewProcess =
-        spawn(
-
-          "npx",
-
-          [
-
-            "serve",
-            WORKSPACE,
-            "-l",
-            "4173"
-
-          ],
-
-          {
-
-            shell:true
-
-          }
-
-        );
-
-      previewProcess.stdout.on(
-
-        "data",
-
-        (data) => {
-
-          console.log(
-            data.toString()
-          );
-
-        }
-
-      );
-
-      previewProcess.stderr.on(
-
-        "data",
-
-        (data) => {
-
-          console.log(
-            data.toString()
-          );
-
-        }
-
-      );
-
-      /* =========================
-         URL
-      ========================= */
-
-      const url =
-        "http://localhost:4173";
-
-      res.json({
-
-        success:true,
-        url
-
-      });
-
-    } catch(err){
-
-      res.status(500).json({
-
-        success:false,
-        error:err.message
-
-      });
-
-    }
-
-  }
-
-);
-/* =========================
-   DEPLOY PROJECT
-========================= */
-
-app.post(
-
-  "/deploy-project",
-
-  async (req,res) => {
-
-    try {
-
-      /* =========================
-         FAKE DEPLOY URL
-      ========================= */
-
-      const projectId =
-        Date.now();
-
-      const url =
-
-`https://project-${projectId}.rehman-ai.dev`;
-
-      res.json({
-
-        success:true,
-        url
-
-      });
-
-    } catch(err){
-
-      res.status(500).json({
-
-        success:false,
-        error:err.message
-
-      });
-
-    }
-
-  }
-
-);
-/* =========================
-   START SERVER
-========================= */
+// =========================
+// START SERVER
+// =========================
 
 app.listen(
 
   PORT,
 
-  () => {
+  ()=>{
 
     console.log(`
 
-🚀 AI Dev Mentor Running
-http://localhost:${PORT}
+🚀 AI DEV MENTOR RUNNING
+
+🌐 http://localhost:${PORT}
+
+🤖 AI SYSTEM:
+ONLINE
 
     `);
 
